@@ -25,7 +25,6 @@
         app:tabSelectedTextColor="@color/white"
         app:tabIndicatorColor="@color/accent_blue"
         app:tabBackground="@color/surface_medium"
-        app:tabCornerRadius="8dp"
         app:tabMode="fixed"
         app:tabGravity="fill">
 
