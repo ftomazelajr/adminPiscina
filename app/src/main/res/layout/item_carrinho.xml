@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp"
+    android:gravity="center_vertical"
+    android:background="@color/surface_light"
+    android:layout_margin="4dp">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvItemNome"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Produto"
+            android:textColor="@color/white"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tvItemPreco"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="R$ 0,00"
+            android:textColor="@color/success_green"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnRemover"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:text="-"
+            android:textAllCaps="false"
+            app:backgroundTint="@color/danger_red"
+            app:cornerRadius="16dp"
+            android:minWidth="0dp"
+            android:padding="0dp" />
+
+        <TextView
+            android:id="@+id/tvQuantidade"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:paddingHorizontal="12dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAdicionarItem"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:text="+"
+            android:textAllCaps="false"
+            app:backgroundTint="@color/success_green"
+            app:cornerRadius="16dp"
+            android:minWidth="0dp"
+            android:padding="0dp" />
+    </LinearLayout>
+</LinearLayout>

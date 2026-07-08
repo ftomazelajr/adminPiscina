@@ -3,6 +3,7 @@ package com.tomazela.adminpiscina
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.google.firebase.auth.FirebaseAuth
@@ -10,6 +11,7 @@ import com.tomazela.adminpiscina.databinding.ActivityMainBinding
 import com.tomazela.adminpiscina.ui.clientes.ClientesFragment
 import com.tomazela.adminpiscina.ui.dashboard.DashboardFragment
 import com.tomazela.adminpiscina.ui.login.LoginActivity
+import com.tomazela.adminpiscina.ui.pdv.PdvFragment
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -27,7 +29,6 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        // Carregar o DashboardFragment
         loadFragment(DashboardFragment())
     }
 
@@ -47,28 +48,23 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onProdutosClick(view: View) {
-        // TODO: Abrir tela de produtos
-        // loadFragment(ProdutosFragment())
+        Toast.makeText(this, "Em breve: Produtos", Toast.LENGTH_SHORT).show()
     }
 
     fun onPdvClick(view: View) {
-        // TODO: Abrir tela de PDV
-        // loadFragment(PdvFragment())
+        loadFragment(PdvFragment())
     }
 
     fun onServicosClick(view: View) {
-        // TODO: Abrir tela de serviços
-        // loadFragment(ServicosFragment())
+        Toast.makeText(this, "Em breve: Serviços", Toast.LENGTH_SHORT).show()
     }
 
     fun onFaturamentoClick(view: View) {
-        // TODO: Abrir tela de faturamento
-        // loadFragment(FaturamentoFragment())
+        Toast.makeText(this, "Em breve: Faturamento", Toast.LENGTH_SHORT).show()
     }
 
     fun onRecebimentosClick(view: View) {
-        // TODO: Abrir tela de recebimentos
-        // loadFragment(RecebimentosFragment())
+        Toast.makeText(this, "Em breve: Recebimentos", Toast.LENGTH_SHORT).show()
     }
 
     private fun navigateToLogin() {
