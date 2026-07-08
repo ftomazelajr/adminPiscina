@@ -12,6 +12,7 @@ import com.tomazela.adminpiscina.ui.clientes.ClientesFragment
 import com.tomazela.adminpiscina.ui.dashboard.DashboardFragment
 import com.tomazela.adminpiscina.ui.login.LoginActivity
 import com.tomazela.adminpiscina.ui.pdv.PdvFragment
+import com.tomazela.adminpiscina.ui.servicos.ServicosFragment
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -56,7 +57,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onServicosClick(view: View) {
-        Toast.makeText(this, "Em breve: Serviços", Toast.LENGTH_SHORT).show()
+        loadFragment(ServicosFragment())
     }
 
     fun onFaturamentoClick(view: View) {
