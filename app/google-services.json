@@ -1,0 +1,35 @@
+{
+  "project_info": {
+    "project_number": "776818671387",
+    "project_id": "tomazela-piscinas"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:776818671387:android:ca4211e6fa8f3f1c889dbe",
+        "android_client_info": {
+          "package_name": "com.tomazela.adminpiscina"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_2Ssx3a3CW3PEP2RBh7j5TQl1UPuSg4k"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
