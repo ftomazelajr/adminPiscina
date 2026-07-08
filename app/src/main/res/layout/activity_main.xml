@@ -14,13 +14,14 @@
         app:title="Admin Piscina"
         app:titleTextColor="@color/white">
 
-        <ImageView
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:src="@drawable/ic_logout"
-            android:contentDescription="Sair"
-            android:padding="4dp"
+            android:text="Sair"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:padding="8dp"
             android:onClick="onLogoutClick" />
     </com.google.android.material.appbar.MaterialToolbar>
 
