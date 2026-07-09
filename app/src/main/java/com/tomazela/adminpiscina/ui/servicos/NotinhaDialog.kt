@@ -10,7 +10,6 @@ import android.net.Uri
 import android.os.Environment
 import android.view.View
 import android.view.Window
-import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ScrollView
@@ -29,36 +28,31 @@ import java.util.Locale
 
 class NotinhaDialog(private val context: Context, private val servico: Servico) {
 
-    private lateinit var dialog: Dialog
     private val formatador = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))
     private val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale("pt", "BR"))
 
     fun show() {
-        dialog = Dialog(context)
+        val dialog = Dialog(context)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.dialog_notinha)
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         dialog.setCancelable(true)
         
-        configurarNotinha()
-        adicionarBotoes()
+        // Configurar dados
+        configurarNotinha(dialog)
         
-        dialog.show()
-    }
-
-    private fun adicionarBotoes() {
-        // Encontrar o container principal (ScrollView)
+        // Adicionar botões
         val scrollView = dialog.findViewById<ScrollView>(android.R.id.content)
         val parentLayout = scrollView?.getChildAt(0) as? LinearLayout
         
-        // Criar um container para os botões
+        // Container dos botões
         val botoesContainer = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
-            setPadding(24, 8, 24, 16)
+            setPadding(24, 16, 24, 24)
         }
         
         // Botão WhatsApp
@@ -84,7 +78,7 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
             setTextColor(Color.WHITE)
             setBackgroundColor(ContextCompat.getColor(context, R.color.accent_blue))
             setOnClickListener {
-                salvarComoImagem()
+                salvarComoImagem(dialog)
             }
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -116,11 +110,12 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
         botoesContainer.addView(btnSalvar)
         botoesContainer.addView(btnFechar)
         
-        // Adicionar o container de botões ao layout principal
         parentLayout?.addView(botoesContainer)
+        
+        dialog.show()
     }
 
-    private fun configurarNotinha() {
+    private fun configurarNotinha(dialog: Dialog) {
         val data = dateFormat.format(Date(servico.timestamp))
         val total = formatador.format(servico.total)
         
@@ -128,7 +123,7 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
         dialog.findViewById<TextView>(R.id.tvClienteNotinha)?.text = servico.clienteNome
         
         val tvStatus = dialog.findViewById<TextView>(R.id.tvStatusNotinha)
-        tvStatus?.text = servico.status.toUpperCase()
+        tvStatus?.text = servico.status.uppercase()
         tvStatus?.setTextColor(
             when (servico.status) {
                 "Pendente" -> ContextCompat.getColor(context, R.color.warning_orange)
@@ -221,7 +216,7 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
             TOTAL: $total
             ----------------------------------------
             
-            ✅ STATUS: ${servico.status.toUpperCase()}
+            ✅ STATUS: ${servico.status.uppercase()}
             
             ========================================
             Obrigado pela preferência!
@@ -229,9 +224,8 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
         """.trimIndent()
     }
 
-    private fun salvarComoImagem() {
+    private fun salvarComoImagem(dialog: Dialog) {
         try {
-            // Pegar a view da notinha
             val view = dialog.findViewById<LinearLayout>(R.id.llNotinha)
             
             // Medir a view
@@ -248,6 +242,9 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
             // Salvar
             val fileName = "notinha_${System.currentTimeMillis()}.png"
             val picturesDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+            if (picturesDir != null && !picturesDir.exists()) {
+                picturesDir.mkdirs()
+            }
             val file = File(picturesDir, fileName)
             val outputStream = FileOutputStream(file)
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
