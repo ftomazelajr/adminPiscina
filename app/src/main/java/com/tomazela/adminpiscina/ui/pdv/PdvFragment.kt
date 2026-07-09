@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.database.*
 import com.tomazela.adminpiscina.R
@@ -44,6 +45,11 @@ class PdvFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         database = FirebaseDatabase.getInstance().getReference()
+
+        // Botão voltar
+        binding.btnVoltar.setOnClickListener {
+            activity?.onBackPressed()
+        }
 
         setupRecyclerViews()
         setupListeners()
@@ -138,6 +144,7 @@ class PdvFragment : Fragment() {
         if (query.isEmpty()) {
             clienteSelecionado = null
             binding.tvClienteSelecionado.text = "Nenhum cliente selecionado"
+            binding.tvClienteSelecionado.setTextColor(resources.getColor(R.color.warning_orange))
             return
         }
 
@@ -147,6 +154,7 @@ class PdvFragment : Fragment() {
 
         if (clientesFiltrados.isEmpty()) {
             binding.tvClienteSelecionado.text = "Nenhum cliente encontrado"
+            binding.tvClienteSelecionado.setTextColor(resources.getColor(R.color.danger_red))
             return
         }
 
@@ -159,7 +167,8 @@ class PdvFragment : Fragment() {
             .setTitle("Selecione um cliente")
             .setItems(nomes) { _, which ->
                 clienteSelecionado = clientes[which]
-                binding.tvClienteSelecionado.text = "Cliente: ${clienteSelecionado?.nome}"
+                binding.tvClienteSelecionado.text = "✅ ${clienteSelecionado?.nome}"
+                binding.tvClienteSelecionado.setTextColor(resources.getColor(R.color.success_green))
                 binding.etBuscarCliente.setText(clienteSelecionado?.nome)
             }
             .setNegativeButton("Cancelar", null)
@@ -323,6 +332,7 @@ class PdvFragment : Fragment() {
                 limparCarrinho()
                 clienteSelecionado = null
                 binding.tvClienteSelecionado.text = "Nenhum cliente selecionado"
+                binding.tvClienteSelecionado.setTextColor(resources.getColor(R.color.warning_orange))
                 binding.etBuscarCliente.setText("")
             }
             .addOnFailureListener { e ->

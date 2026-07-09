@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="12dp"
+        android:padding="16dp"
         android:gravity="center_vertical">
 
         <LinearLayout
@@ -27,7 +27,7 @@
                 android:layout_height="wrap_content"
                 android:text="Produto"
                 android:textColor="@color/white"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -36,17 +36,19 @@
                 android:layout_height="wrap_content"
                 android:text="R$ 0,00"
                 android:textColor="@color/success_green"
-                android:textSize="14sp" />
+                android:textSize="16sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnAdicionar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:text="+"
+            android:textSize="24sp"
+            android:textStyle="bold"
             android:textAllCaps="false"
             app:backgroundTint="@color/accent_blue"
-            app:cornerRadius="20dp"
-            android:minWidth="40dp" />
+            app:cornerRadius="24dp" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
