@@ -1,5 +1,8 @@
 package com.tomazela.adminpiscina.ui.servicos
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -38,6 +41,66 @@ class ServicoAdapter(
 
     override fun getItemCount() = servicos.size
 
+    private fun gerarNotinha(servico: Servico): String {
+        val data = dateFormat.format(Date(servico.timestamp))
+        val total = formatador.format(servico.total)
+        
+        val itensTexto = servico.itens.joinToString("\n") { 
+            "  ${it.quantidade}x ${it.nome} - ${formatador.format(it.precoUnitario * it.quantidade)}"
+        }
+        
+        return """
+            ========================================
+                   🏊 TOMAZELA PISCINAS
+                   ========================================
+                   
+            📅 DATA: $data
+            👤 CLIENTE: ${servico.clienteNome}
+            
+            ----------------------------------------
+            ITENS DO PEDIDO:
+            $itensTexto
+            
+            ----------------------------------------
+            TOTAL: $total
+            ----------------------------------------
+            
+            ✅ STATUS: ${servico.status.toUpperCase()}
+            
+            ========================================
+            Obrigado pela preferência!
+            ========================================
+        """.trimIndent()
+    }
+
+    private fun compartilharWhatsApp(context: Context, servico: Servico) {
+        val notinha = gerarNotinha(servico)
+        
+        // Tentar obter o telefone do cliente (se disponível)
+        val telefone = servico.clienteId // Pode ser melhor ter um campo de telefone
+        
+        val intent = Intent(Intent.ACTION_VIEW)
+        val url = "https://api.whatsapp.com/send?text=${Uri.encode(notinha)}"
+        intent.data = Uri.parse(url)
+        
+        try {
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            // Se WhatsApp não estiver instalado, abrir com qualquer app de compartilhamento
+            val shareIntent = Intent(Intent.ACTION_SEND)
+            shareIntent.type = "text/plain"
+            shareIntent.putExtra(Intent.EXTRA_TEXT, notinha)
+            shareIntent.putExtra(Intent.EXTRA_TITLE, "Notinha do Pedido")
+            
+            try {
+                context.startActivity(Intent.createChooser(shareIntent, "Compartilhar Notinha"))
+            } catch (ex: Exception) {
+                // Fallback: mostrar toast
+                android.widget.Toast.makeText(context, "Erro ao compartilhar", android.widget.Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
     inner class ServicoViewHolder(
         private val binding: ItemServicoBinding
     ) : RecyclerView.ViewHolder(binding.root) {
@@ -66,21 +129,26 @@ class ServicoAdapter(
                 }
             )
 
+            // Mostrar/ocultar botões de aprovação/rejeição
+            if (servico.status == "Pendente") {
+                binding.btnAprovar.visibility = android.view.View.VISIBLE
+                binding.btnRejeitar.visibility = android.view.View.VISIBLE
+            } else {
+                binding.btnAprovar.visibility = android.view.View.GONE
+                binding.btnRejeitar.visibility = android.view.View.GONE
+            }
+
+            // Botão compartilhar sempre visível
+            binding.btnCompartilhar.setOnClickListener {
+                compartilharWhatsApp(binding.root.context, servico)
+            }
+
             binding.btnAprovar.setOnClickListener {
                 onAprovar(servico)
             }
 
             binding.btnRejeitar.setOnClickListener {
                 onRejeitar(servico)
-            }
-
-            // Ocultar botões se já aprovado/rejeitado
-            if (servico.status != "Pendente") {
-                binding.btnAprovar.visibility = ViewGroup.GONE
-                binding.btnRejeitar.visibility = ViewGroup.GONE
-            } else {
-                binding.btnAprovar.visibility = ViewGroup.VISIBLE
-                binding.btnRejeitar.visibility = ViewGroup.VISIBLE
             }
         }
     }

@@ -97,7 +97,8 @@
                 android:textAllCaps="false"
                 app:backgroundTint="@color/success_green"
                 app:cornerRadius="8dp"
-                android:layout_marginEnd="8dp" />
+                android:layout_marginEnd="4dp"
+                android:visibility="gone" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnRejeitar"
@@ -107,7 +108,21 @@
                 android:text="✗ Rejeitar"
                 android:textAllCaps="false"
                 app:backgroundTint="@color/danger_red"
-                app:cornerRadius="8dp" />
+                app:cornerRadius="8dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:visibility="gone" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCompartilhar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="📤 WhatsApp"
+                android:textAllCaps="false"
+                app:backgroundTint="@color/success_green"
+                app:cornerRadius="8dp"
+                android:layout_marginStart="4dp" />
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

@@ -101,7 +101,6 @@ class ServicosFragment : Fragment() {
                 adapter.submitList(servicosPendentes.sortedByDescending { it.timestamp })
                 binding.progressServicos.visibility = View.GONE
                 
-                // Se não houver dados, mostrar mensagem
                 if (servicosPendentes.isEmpty()) {
                     Toast.makeText(context, "Nenhum pedido pendente", Toast.LENGTH_SHORT).show()
                 }
