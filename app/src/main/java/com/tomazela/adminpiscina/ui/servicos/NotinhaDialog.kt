@@ -36,15 +36,17 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.dialog_notinha)
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.setCancelable(true)
         
         configurarNotinha()
         
-        // Adicionar botões
+        // Adicionar botões no rodapé do dialog
+        val rootView = dialog.findViewById<View>(android.R.id.content) as? LinearLayout
         val container = dialog.findViewById<LinearLayout>(R.id.llNotinha)?.parent as? LinearLayout
         
         // Botão WhatsApp
         val btnWhatsApp = Button(context).apply {
-            text = "📤 WhatsApp"
+            text = "📤 Compartilhar no WhatsApp"
             setTextColor(Color.WHITE)
             setBackgroundColor(ContextCompat.getColor(context, R.color.success_green))
             setOnClickListener {
@@ -60,7 +62,7 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
         
         // Botão Salvar PNG
         val btnSalvar = Button(context).apply {
-            text = "💾 Salvar como Imagem"
+            text = "💾 Salvar como Imagem (PNG)"
             setTextColor(Color.WHITE)
             setBackgroundColor(ContextCompat.getColor(context, R.color.accent_blue))
             setOnClickListener {
@@ -90,6 +92,7 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
             }
         }
         
+        // Adicionar os botões ao container
         container?.addView(btnWhatsApp)
         container?.addView(btnSalvar)
         container?.addView(btnFechar)
@@ -183,7 +186,7 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
             ========================================
                    🏊 TOMAZELA PISCINAS
             ========================================
-            CNPJ: 00.000.000/0001-00
+            CNPJ: 40.136.528/0001-07
             Rua Romualdo Albino Balestrin, 35
             Tel: (14) 98172-2063
             
@@ -230,6 +233,7 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
             outputStream.close()
             
+            // Mostrar mensagem de sucesso
             Toast.makeText(context, "✅ Notinha salva em: ${file.absolutePath}", Toast.LENGTH_LONG).show()
             
             // Abrir para compartilhar
