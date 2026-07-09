@@ -10,8 +10,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.tomazela.adminpiscina.databinding.ActivityMainBinding
 import com.tomazela.adminpiscina.ui.clientes.ClientesFragment
 import com.tomazela.adminpiscina.ui.dashboard.DashboardFragment
+import com.tomazela.adminpiscina.ui.faturamento.FaturamentoFragment
 import com.tomazela.adminpiscina.ui.login.LoginActivity
 import com.tomazela.adminpiscina.ui.pdv.PdvFragment
+import com.tomazela.adminpiscina.ui.produtos.ProdutosFragment
+import com.tomazela.adminpiscina.ui.recebimentos.RecebimentosFragment
 import com.tomazela.adminpiscina.ui.servicos.ServicosFragment
 
 class MainActivity : AppCompatActivity() {
@@ -49,7 +52,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onProdutosClick(view: View) {
-        Toast.makeText(this, "Em breve: Produtos", Toast.LENGTH_SHORT).show()
+        loadFragment(ProdutosFragment())
     }
 
     fun onPdvClick(view: View) {
@@ -61,11 +64,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onFaturamentoClick(view: View) {
-        Toast.makeText(this, "Em breve: Faturamento", Toast.LENGTH_SHORT).show()
+        loadFragment(FaturamentoFragment())
     }
 
     fun onRecebimentosClick(view: View) {
-        Toast.makeText(this, "Em breve: Recebimentos", Toast.LENGTH_SHORT).show()
+        loadFragment(RecebimentosFragment())
     }
 
     private fun navigateToLogin() {
