@@ -36,6 +36,22 @@
             android:gravity="center"
             android:layout_marginTop="2dp" />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Rua Romualdo Albino Balestrin, 35"
+            android:textSize="10sp"
+            android:textColor="#555555"
+            android:gravity="center" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tel: (14) 98172-2063"
+            android:textSize="10sp"
+            android:textColor="#555555"
+            android:gravity="center" />
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"

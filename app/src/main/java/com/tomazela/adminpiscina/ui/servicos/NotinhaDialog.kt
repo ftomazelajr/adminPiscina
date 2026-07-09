@@ -6,7 +6,6 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Environment
 import android.view.View
@@ -40,30 +39,26 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
         
         configurarNotinha()
         
-        // Botão compartilhar WhatsApp
-        val btnWhatsApp = dialog.findViewById<Button>(android.R.id.button1)
-        btnWhatsApp?.visibility = View.GONE
+        // Adicionar botões
+        val container = dialog.findViewById<LinearLayout>(R.id.llNotinha)?.parent as? LinearLayout
         
-        // Botão fechar
-        val btnFechar = dialog.findViewById<Button>(android.R.id.button2)
-        btnFechar?.visibility = View.GONE
-        
-        // Adicionar botão de compartilhar
-        val btnCompartilhar = Button(context).apply {
-            text = "📤 Compartilhar no WhatsApp"
+        // Botão WhatsApp
+        val btnWhatsApp = Button(context).apply {
+            text = "📤 WhatsApp"
             setTextColor(Color.WHITE)
             setBackgroundColor(ContextCompat.getColor(context, R.color.success_green))
             setOnClickListener {
-                compartilharNotinha()
+                compartilharWhatsApp()
             }
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             ).apply {
-                setMargins(24, 8, 24, 8)
+                setMargins(24, 8, 24, 4)
             }
         }
         
+        // Botão Salvar PNG
         val btnSalvar = Button(context).apply {
             text = "💾 Salvar como Imagem"
             setTextColor(Color.WHITE)
@@ -75,11 +70,12 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             ).apply {
-                setMargins(24, 8, 24, 8)
+                setMargins(24, 4, 24, 4)
             }
         }
         
-        val btnFecharDialog = Button(context).apply {
+        // Botão Fechar
+        val btnFechar = Button(context).apply {
             text = "✕ Fechar"
             setTextColor(Color.WHITE)
             setBackgroundColor(ContextCompat.getColor(context, R.color.danger_red))
@@ -90,14 +86,13 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             ).apply {
-                setMargins(24, 8, 24, 16)
+                setMargins(24, 4, 24, 16)
             }
         }
         
-        val container = dialog.findViewById<LinearLayout>(R.id.llNotinha)?.parent as? LinearLayout
-        container?.addView(btnCompartilhar)
+        container?.addView(btnWhatsApp)
         container?.addView(btnSalvar)
-        container?.addView(btnFecharDialog)
+        container?.addView(btnFechar)
         
         dialog.show()
     }
@@ -106,13 +101,9 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
         val data = dateFormat.format(Date(servico.timestamp))
         val total = formatador.format(servico.total)
         
-        // Data
         dialog.findViewById<TextView>(R.id.tvDataNotinha)?.text = data
-        
-        // Cliente
         dialog.findViewById<TextView>(R.id.tvClienteNotinha)?.text = servico.clienteNome
         
-        // Status
         val tvStatus = dialog.findViewById<TextView>(R.id.tvStatusNotinha)
         tvStatus?.text = servico.status.toUpperCase()
         tvStatus?.setTextColor(
@@ -123,10 +114,8 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
             }
         )
         
-        // Total
         dialog.findViewById<TextView>(R.id.tvTotalNotinha)?.text = total
         
-        // Itens
         val container = dialog.findViewById<LinearLayout>(R.id.llItensNotinha)
         container?.removeAllViews()
         
@@ -167,7 +156,7 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
         }
     }
 
-    private fun compartilharNotinha() {
+    private fun compartilharWhatsApp() {
         val notinha = gerarTextoNotinha()
         val intent = Intent(Intent.ACTION_VIEW)
         val url = "https://api.whatsapp.com/send?text=${Uri.encode(notinha)}"
@@ -176,7 +165,6 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
         try {
             context.startActivity(intent)
         } catch (e: Exception) {
-            // Fallback: compartilhar como texto
             val shareIntent = Intent(Intent.ACTION_SEND)
             shareIntent.type = "text/plain"
             shareIntent.putExtra(Intent.EXTRA_TEXT, notinha)
@@ -195,6 +183,9 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
             ========================================
                    🏊 TOMAZELA PISCINAS
             ========================================
+            CNPJ: 00.000.000/0001-00
+            Rua Romualdo Albino Balestrin, 35
+            Tel: (14) 98172-2063
             
             📅 DATA: $data
             👤 CLIENTE: ${servico.clienteNome}
@@ -219,20 +210,27 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
         try {
             val view = dialog.findViewById<LinearLayout>(R.id.llNotinha)
             
-            // Criar bitmap da view
-            val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
+            // Medir a view antes de criar o bitmap
+            view.measure(
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+            )
+            view.layout(0, 0, view.measuredWidth, view.measuredHeight)
+            
+            // Criar bitmap
+            val bitmap = Bitmap.createBitmap(view.measuredWidth, view.measuredHeight, Bitmap.Config.ARGB_8888)
             val canvas = Canvas(bitmap)
             view.draw(canvas)
             
             // Salvar no armazenamento
             val fileName = "notinha_${System.currentTimeMillis()}.png"
-            val file = File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), fileName)
+            val picturesDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+            val file = File(picturesDir, fileName)
             val outputStream = FileOutputStream(file)
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
             outputStream.close()
             
-            // Mostrar mensagem de sucesso
-            Toast.makeText(context, "Notinha salva em: ${file.absolutePath}", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "✅ Notinha salva em: ${file.absolutePath}", Toast.LENGTH_LONG).show()
             
             // Abrir para compartilhar
             val uri = FileProvider.getUriForFile(
@@ -251,6 +249,7 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
             
         } catch (e: Exception) {
             Toast.makeText(context, "Erro ao salvar imagem: ${e.message}", Toast.LENGTH_SHORT).show()
+            e.printStackTrace()
         }
     }
 }

@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.database.*
 import com.tomazela.adminpiscina.R
@@ -46,7 +45,6 @@ class PdvFragment : Fragment() {
 
         database = FirebaseDatabase.getInstance().getReference()
 
-        // Botão voltar
         binding.btnVoltar.setOnClickListener {
             activity?.onBackPressed()
         }
@@ -69,6 +67,9 @@ class PdvFragment : Fragment() {
         carrinhoAdapter = CarrinhoAdapter(
             onQuantidadeChange = { item, novaQuantidade ->
                 atualizarQuantidade(item, novaQuantidade)
+            },
+            onPrecoChange = { item, novoPreco ->
+                atualizarPreco(item, novoPreco)
             },
             onRemover = { item ->
                 removerDoCarrinho(item)
@@ -268,6 +269,14 @@ class PdvFragment : Fragment() {
         val index = carrinho.indexOfFirst { it.produtoId == item.produtoId }
         if (index != -1) {
             carrinho[index] = item.copy(quantidade = novaQuantidade)
+            atualizarCarrinho()
+        }
+    }
+
+    private fun atualizarPreco(item: ItemPedido, novoPreco: Double) {
+        val index = carrinho.indexOfFirst { it.produtoId == item.produtoId }
+        if (index != -1) {
+            carrinho[index] = item.copy(precoUnitario = novoPreco)
             atualizarCarrinho()
         }
     }
