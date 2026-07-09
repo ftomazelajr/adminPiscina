@@ -20,6 +20,8 @@ class ServicosFragment : Fragment() {
     
     private val servicosPendentes = mutableListOf<Servico>()
     private val servicosAprovados = mutableListOf<Servico>()
+    private var listenerPendentes: ChildEventListener? = null
+    private var listenerAprovados: ChildEventListener? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,12 +56,22 @@ class ServicosFragment : Fragment() {
             override fun onTabSelected(tab: com.google.android.material.tabs.TabLayout.Tab?) {
                 when (tab?.position) {
                     0 -> {
-                        adapter.submitList(servicosPendentes.sortedByDescending { it.timestamp })
-                        binding.progressServicos.visibility = View.GONE
+                        if (servicosPendentes.isEmpty()) {
+                            binding.progressServicos.visibility = View.VISIBLE
+                            carregarPendentes()
+                        } else {
+                            adapter.submitList(servicosPendentes.sortedByDescending { it.timestamp })
+                            binding.progressServicos.visibility = View.GONE
+                        }
                     }
                     1 -> {
-                        adapter.submitList(servicosAprovados.sortedByDescending { it.timestamp })
-                        binding.progressServicos.visibility = View.GONE
+                        if (servicosAprovados.isEmpty()) {
+                            binding.progressServicos.visibility = View.VISIBLE
+                            carregarAprovados()
+                        } else {
+                            adapter.submitList(servicosAprovados.sortedByDescending { it.timestamp })
+                            binding.progressServicos.visibility = View.GONE
+                        }
                     }
                 }
             }
@@ -67,95 +79,137 @@ class ServicosFragment : Fragment() {
             override fun onTabUnselected(tab: com.google.android.material.tabs.TabLayout.Tab?) {}
             override fun onTabReselected(tab: com.google.android.material.tabs.TabLayout.Tab?) {}
         })
+        
+        // Selecionar a primeira tab por padrão
+        binding.tabLayout.getTabAt(0)?.select()
     }
 
     private fun carregarServicos() {
         binding.progressServicos.visibility = View.VISIBLE
+        carregarPendentes()
+        carregarAprovados()
+    }
 
-        // Carregar pedidos pendentes
-        database.child("pedidos_pendentes")
-            .addChildEventListener(object : ChildEventListener {
-                override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                    val servico = snapshot.getValue(Servico::class.java)?.copy(id = snapshot.key ?: "")
-                    servico?.let {
-                        // Garantir que o nome do cliente está correto
-                        if (it.clienteNome.isNotEmpty()) {
-                            servicosPendentes.add(it)
+    private fun carregarPendentes() {
+        // Remove listener antigo se existir
+        listenerPendentes?.let { database.child("pedidos_pendentes").removeEventListener(it) }
+        
+        listenerPendentes = object : ChildEventListener {
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                try {
+                    val servico = snapshot.getValue(Servico::class.java)
+                    if (servico != null) {
+                        val servicoComId = servico.copy(id = snapshot.key ?: "")
+                        if (servicoComId.clienteNome.isNotEmpty()) {
+                            servicosPendentes.add(servicoComId)
                             if (binding.tabLayout.selectedTabPosition == 0) {
                                 adapter.submitList(servicosPendentes.sortedByDescending { it.timestamp })
                             }
                             binding.progressServicos.visibility = View.GONE
                         }
                     }
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
+            }
 
-                override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                    val servico = snapshot.getValue(Servico::class.java)?.copy(id = snapshot.key ?: "")
-                    servico?.let {
-                        val index = servicosPendentes.indexOfFirst { it.id == servico.id }
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                try {
+                    val servico = snapshot.getValue(Servico::class.java)
+                    if (servico != null) {
+                        val servicoComId = servico.copy(id = snapshot.key ?: "")
+                        val index = servicosPendentes.indexOfFirst { it.id == servicoComId.id }
                         if (index != -1) {
-                            servicosPendentes[index] = servico
+                            servicosPendentes[index] = servicoComId
                             if (binding.tabLayout.selectedTabPosition == 0) {
                                 adapter.submitList(servicosPendentes.sortedByDescending { it.timestamp })
                             }
                         }
                     }
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
+            }
 
-                override fun onChildRemoved(snapshot: DataSnapshot) {
-                    servicosPendentes.removeAll { it.id == snapshot.key }
-                    if (binding.tabLayout.selectedTabPosition == 0) {
-                        adapter.submitList(servicosPendentes.sortedByDescending { it.timestamp })
-                    }
+            override fun onChildRemoved(snapshot: DataSnapshot) {
+                servicosPendentes.removeAll { it.id == snapshot.key }
+                if (binding.tabLayout.selectedTabPosition == 0) {
+                    adapter.submitList(servicosPendentes.sortedByDescending { it.timestamp })
                 }
-
-                override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
-                override fun onCancelled(error: DatabaseError) {
+                if (servicosPendentes.isEmpty()) {
                     binding.progressServicos.visibility = View.GONE
                 }
-            })
+            }
 
-        // Carregar pedidos aprovados
-        database.child("pedidos")
-            .addChildEventListener(object : ChildEventListener {
-                override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                    val servico = snapshot.getValue(Servico::class.java)?.copy(id = snapshot.key ?: "")
-                    servico?.let {
-                        if (it.clienteNome.isNotEmpty()) {
-                            servicosAprovados.add(it)
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onCancelled(error: DatabaseError) {
+                binding.progressServicos.visibility = View.GONE
+                Toast.makeText(context, "Erro ao carregar pendentes: ${error.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        database.child("pedidos_pendentes").addChildEventListener(listenerPendentes!!)
+    }
+
+    private fun carregarAprovados() {
+        // Remove listener antigo se existir
+        listenerAprovados?.let { database.child("pedidos").removeEventListener(it) }
+        
+        listenerAprovados = object : ChildEventListener {
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                try {
+                    val servico = snapshot.getValue(Servico::class.java)
+                    if (servico != null) {
+                        val servicoComId = servico.copy(id = snapshot.key ?: "")
+                        if (servicoComId.clienteNome.isNotEmpty()) {
+                            servicosAprovados.add(servicoComId)
                             if (binding.tabLayout.selectedTabPosition == 1) {
                                 adapter.submitList(servicosAprovados.sortedByDescending { it.timestamp })
                             }
                             binding.progressServicos.visibility = View.GONE
                         }
                     }
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
+            }
 
-                override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                    val servico = snapshot.getValue(Servico::class.java)?.copy(id = snapshot.key ?: "")
-                    servico?.let {
-                        val index = servicosAprovados.indexOfFirst { it.id == servico.id }
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                try {
+                    val servico = snapshot.getValue(Servico::class.java)
+                    if (servico != null) {
+                        val servicoComId = servico.copy(id = snapshot.key ?: "")
+                        val index = servicosAprovados.indexOfFirst { it.id == servicoComId.id }
                         if (index != -1) {
-                            servicosAprovados[index] = servico
+                            servicosAprovados[index] = servicoComId
                             if (binding.tabLayout.selectedTabPosition == 1) {
                                 adapter.submitList(servicosAprovados.sortedByDescending { it.timestamp })
                             }
                         }
                     }
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
+            }
 
-                override fun onChildRemoved(snapshot: DataSnapshot) {
-                    servicosAprovados.removeAll { it.id == snapshot.key }
-                    if (binding.tabLayout.selectedTabPosition == 1) {
-                        adapter.submitList(servicosAprovados.sortedByDescending { it.timestamp })
-                    }
+            override fun onChildRemoved(snapshot: DataSnapshot) {
+                servicosAprovados.removeAll { it.id == snapshot.key }
+                if (binding.tabLayout.selectedTabPosition == 1) {
+                    adapter.submitList(servicosAprovados.sortedByDescending { it.timestamp })
                 }
-
-                override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
-                override fun onCancelled(error: DatabaseError) {
+                if (servicosAprovados.isEmpty()) {
                     binding.progressServicos.visibility = View.GONE
                 }
-            })
+            }
+
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onCancelled(error: DatabaseError) {
+                binding.progressServicos.visibility = View.GONE
+                Toast.makeText(context, "Erro ao carregar aprovados: ${error.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        database.child("pedidos").addChildEventListener(listenerAprovados!!)
     }
 
     private fun aprovarServico(servico: Servico) {
@@ -165,26 +219,36 @@ class ServicosFragment : Fragment() {
             .addOnSuccessListener {
                 database.child("pedidos_pendentes").child(servico.id).removeValue()
                     .addOnSuccessListener {
+                        servicosPendentes.removeAll { it.id == servico.id }
                         Toast.makeText(context, "Serviço aprovado!", Toast.LENGTH_SHORT).show()
+                        if (binding.tabLayout.selectedTabPosition == 0) {
+                            adapter.submitList(servicosPendentes.sortedByDescending { it.timestamp })
+                        }
                     }
             }
             .addOnFailureListener {
-                Toast.makeText(context, "Erro ao aprovar", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Erro ao aprovar: ${it.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
     private fun rejeitarServico(servico: Servico) {
         database.child("pedidos_pendentes").child(servico.id).removeValue()
             .addOnSuccessListener {
+                servicosPendentes.removeAll { it.id == servico.id }
                 Toast.makeText(context, "Serviço rejeitado", Toast.LENGTH_SHORT).show()
+                if (binding.tabLayout.selectedTabPosition == 0) {
+                    adapter.submitList(servicosPendentes.sortedByDescending { it.timestamp })
+                }
             }
             .addOnFailureListener {
-                Toast.makeText(context, "Erro ao rejeitar", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Erro ao rejeitar: ${it.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        listenerPendentes?.let { database.child("pedidos_pendentes").removeEventListener(it) }
+        listenerAprovados?.let { database.child("pedidos").removeEventListener(it) }
         _binding = null
     }
 }
