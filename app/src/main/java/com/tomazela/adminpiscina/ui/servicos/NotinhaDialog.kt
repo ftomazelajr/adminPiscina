@@ -12,7 +12,6 @@ import android.view.View
 import android.view.Window
 import android.widget.Button
 import android.widget.LinearLayout
-import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -38,79 +37,24 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         dialog.setCancelable(true)
         
-        // Configurar dados
+        // Configurar dados da notinha
         configurarNotinha(dialog)
         
-        // Adicionar botões - procurando o container correto
-        val rootView = dialog.findViewById<View>(android.R.id.content)
-        val parentLayout = rootView as? LinearLayout
-        
-        // Container dos botões
-        val botoesContainer = LinearLayout(context).apply {
-            orientation = LinearLayout.VERTICAL
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            setPadding(24, 16, 24, 24)
+        // Configurar botões
+        val btnWhatsApp = dialog.findViewById<Button>(R.id.btnWhatsAppNotinha)
+        btnWhatsApp?.setOnClickListener {
+            compartilharWhatsApp()
         }
         
-        // Botão WhatsApp
-        val btnWhatsApp = Button(context).apply {
-            text = "📤 Compartilhar no WhatsApp"
-            setTextColor(Color.WHITE)
-            setBackgroundColor(ContextCompat.getColor(context, R.color.success_green))
-            setOnClickListener {
-                compartilharWhatsApp()
-            }
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply {
-                setMargins(0, 4, 0, 4)
-            }
-            setPadding(16, 16, 16, 16)
+        val btnSalvar = dialog.findViewById<Button>(R.id.btnSalvarNotinha)
+        btnSalvar?.setOnClickListener {
+            salvarComoImagem(dialog)
         }
         
-        // Botão Salvar PNG
-        val btnSalvar = Button(context).apply {
-            text = "💾 Salvar como Imagem (PNG)"
-            setTextColor(Color.WHITE)
-            setBackgroundColor(ContextCompat.getColor(context, R.color.accent_blue))
-            setOnClickListener {
-                salvarComoImagem(dialog)
-            }
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply {
-                setMargins(0, 4, 0, 4)
-            }
-            setPadding(16, 16, 16, 16)
+        val btnFechar = dialog.findViewById<Button>(R.id.btnFecharNotinha)
+        btnFechar?.setOnClickListener {
+            dialog.dismiss()
         }
-        
-        // Botão Fechar
-        val btnFechar = Button(context).apply {
-            text = "✕ Fechar"
-            setTextColor(Color.WHITE)
-            setBackgroundColor(ContextCompat.getColor(context, R.color.danger_red))
-            setOnClickListener {
-                dialog.dismiss()
-            }
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply {
-                setMargins(0, 4, 0, 4)
-            }
-            setPadding(16, 16, 16, 16)
-        }
-        
-        botoesContainer.addView(btnWhatsApp)
-        botoesContainer.addView(btnSalvar)
-        botoesContainer.addView(btnFechar)
-        
-        parentLayout?.addView(botoesContainer)
         
         dialog.show()
     }
