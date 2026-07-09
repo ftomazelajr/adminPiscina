@@ -47,15 +47,47 @@ class CarrinhoAdapter(
         fun bind(item: ItemPedido) {
             binding.tvItemNome.text = "${item.quantidade}x ${item.nome}"
             
-            // Preço unitário formatado
-            val precoFormatado = formatador.format(item.precoUnitario)
-            binding.etPrecoUnitario.setText(precoFormatado.replace("R$", "").trim())
+            // Preço unitário formatado (sem R$)
+            val precoFormatado = formatador.format(item.precoUnitario).replace("R$", "").trim()
+            binding.etPrecoUnitario.setText(precoFormatado)
             
             binding.tvQuantidade.text = item.quantidade.toString()
 
-            // Listener para edição do preço
+            // Remover listener antigo para evitar duplicação
             binding.etPrecoUnitario.removeTextChangedListener(precoWatcher)
-            binding.etPrecoUnitario.addTextChangedListener(precoWatcher)
+            
+            // Adicionar novo listener
+            binding.etPrecoUnitario.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+                
+                override fun afterTextChanged(s: Editable?) {
+                    if (isUpdating) return
+                    if (s.isNullOrEmpty()) return
+                    
+                    val position = adapterPosition
+                    if (position == RecyclerView.NO_POSITION) return
+                    
+                    val item = itens[position]
+                    try {
+                        val precoStr = s.toString().replace(",", ".").trim()
+                        val novoPreco = precoStr.toDoubleOrNull()
+                        if (novoPreco != null && novoPreco >= 0) {
+                            isUpdating = true
+                            onPrecoChange(item, novoPreco)
+                            // Atualizar a exibição formatada
+                            val formatado = formatador.format(novoPreco).replace("R$", "").trim()
+                            binding.etPrecoUnitario.setText(formatado)
+                            binding.etPrecoUnitario.setSelection(formatado.length)
+                            isUpdating = false
+                        }
+                    } catch (e: Exception) {
+                        // Ignorar erros de parsing
+                        isUpdating = false
+                    }
+                }
+            })
 
             binding.btnRemover.setOnClickListener {
                 if (item.quantidade > 1) {
@@ -67,37 +99,6 @@ class CarrinhoAdapter(
 
             binding.btnAdicionarItem.setOnClickListener {
                 onQuantidadeChange(item, item.quantidade + 1)
-            }
-        }
-
-        private val precoWatcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            
-            override fun afterTextChanged(s: Editable?) {
-                if (isUpdating) return
-                if (s.isNullOrEmpty()) return
-                
-                val position = adapterPosition
-                if (position == RecyclerView.NO_POSITION) return
-                
-                val item = itens[position]
-                try {
-                    val precoStr = s.toString().replace(",", ".").trim()
-                    val novoPreco = precoStr.toDoubleOrNull()
-                    if (novoPreco != null && novoPreco >= 0) {
-                        isUpdating = true
-                        onPrecoChange(item, novoPreco)
-                        // Atualizar a exibição formatada
-                        val formatado = formatador.format(novoPreco).replace("R$", "").trim()
-                        binding.etPrecoUnitario.setText(formatado)
-                        binding.etPrecoUnitario.setSelection(formatado.length)
-                        isUpdating = false
-                    }
-                } catch (e: Exception) {
-                    // Ignorar erros de parsing
-                }
             }
         }
     }

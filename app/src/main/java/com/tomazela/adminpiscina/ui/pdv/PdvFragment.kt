@@ -292,7 +292,10 @@ class PdvFragment : Fragment() {
     }
 
     private fun atualizarCarrinho() {
+        // Atualizar o adapter
         carrinhoAdapter.submitList(carrinho)
+        
+        // Calcular o total corretamente
         val total = carrinho.sumOf { it.precoUnitario * it.quantidade }
         val formatador = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))
         binding.tvTotal.text = formatador.format(total)
