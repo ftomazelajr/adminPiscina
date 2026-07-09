@@ -24,7 +24,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="TOM AZELA PISCINAS"
+                android:text="TOMAZELA PISCINAS"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="#2C2C2C"
