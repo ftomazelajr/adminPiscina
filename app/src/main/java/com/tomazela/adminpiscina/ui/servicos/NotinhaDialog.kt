@@ -41,9 +41,9 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
         // Configurar dados
         configurarNotinha(dialog)
         
-        // Adicionar botões
-        val scrollView = dialog.findViewById<ScrollView>(android.R.id.content)
-        val parentLayout = scrollView?.getChildAt(0) as? LinearLayout
+        // Adicionar botões - procurando o container correto
+        val rootView = dialog.findViewById<View>(android.R.id.content)
+        val parentLayout = rootView as? LinearLayout
         
         // Container dos botões
         val botoesContainer = LinearLayout(context).apply {
