@@ -140,7 +140,6 @@ class PdvFragment : Fragment() {
     }
 
     private fun carregarServicos() {
-        // Serviços avulsos fixos
         servicos.clear()
         servicos.add(Produto(
             id = "s1",
@@ -211,6 +210,9 @@ class PdvFragment : Fragment() {
                     }
                     mostrarDialogClientes(clientes, query)
                 }
+            }
+            .addOnFailureListener {
+                Toast.makeText(context, "Erro ao buscar clientes", Toast.LENGTH_SHORT).show()
             }
     }
 
@@ -299,12 +301,16 @@ class PdvFragment : Fragment() {
     private fun salvarPedido(cliente: Cliente?) {
         binding.progressPdv.visibility = View.VISIBLE
 
+        val nomeCliente = cliente?.nome ?: "Consumidor Final"
+        val idCliente = cliente?.id ?: ""
+
         val pedido = Pedido(
-            clienteId = cliente?.id ?: "",
-            clienteNome = cliente?.nome ?: "Consumidor Final",
+            clienteId = idCliente,
+            clienteNome = nomeCliente,
             itens = carrinho.toList(),
             total = carrinho.sumOf { it.precoUnitario * it.quantidade },
-            status = "Pendente"
+            status = "Pendente",
+            timestamp = System.currentTimeMillis()
         )
 
         database.child("pedidos_pendentes").push().setValue(pedido)
@@ -316,9 +322,9 @@ class PdvFragment : Fragment() {
                 binding.tvClienteSelecionado.text = "Nenhum cliente selecionado"
                 binding.etBuscarCliente.setText("")
             }
-            .addOnFailureListener {
+            .addOnFailureListener { e ->
                 binding.progressPdv.visibility = View.GONE
-                Toast.makeText(context, "Erro ao salvar pedido", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Erro ao salvar pedido: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
