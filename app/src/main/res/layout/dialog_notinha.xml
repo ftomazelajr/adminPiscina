@@ -30,7 +30,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="CNPJ: 00.000.000/0001-00"
+            android:text="CNPJ: 12.345.678/0001-90"
             android:textSize="10sp"
             android:textColor="#555555"
             android:gravity="center"

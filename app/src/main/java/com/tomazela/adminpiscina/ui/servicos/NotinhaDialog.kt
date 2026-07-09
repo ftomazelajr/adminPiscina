@@ -41,7 +41,6 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
         configurarNotinha()
         
         // Adicionar botões no rodapé do dialog
-        val rootView = dialog.findViewById<View>(android.R.id.content) as? LinearLayout
         val container = dialog.findViewById<LinearLayout>(R.id.llNotinha)?.parent as? LinearLayout
         
         // Botão WhatsApp
@@ -92,7 +91,6 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
             }
         }
         
-        // Adicionar os botões ao container
         container?.addView(btnWhatsApp)
         container?.addView(btnSalvar)
         container?.addView(btnFechar)
@@ -186,7 +184,7 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
             ========================================
                    🏊 TOMAZELA PISCINAS
             ========================================
-            CNPJ: 40.136.528/0001-07
+            CNPJ: 12.345.678/0001-90
             Rua Romualdo Albino Balestrin, 35
             Tel: (14) 98172-2063
             
@@ -233,7 +231,6 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
             outputStream.close()
             
-            // Mostrar mensagem de sucesso
             Toast.makeText(context, "✅ Notinha salva em: ${file.absolutePath}", Toast.LENGTH_LONG).show()
             
             // Abrir para compartilhar
