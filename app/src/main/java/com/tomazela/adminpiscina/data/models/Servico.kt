@@ -2,13 +2,13 @@ package com.tomazela.adminpiscina.data.models
 
 data class Servico(
     val id: String = "",
-    val tipo: String = "PDV", // PDV, Visita, Servico
+    val tipo: String = "PDV",
     val clienteId: String = "",
     val clienteNome: String = "",
     val data: String = "",
     val itens: List<ItemPedido> = emptyList(),
     val total: Double = 0.0,
-    val status: String = "Pendente", // Pendente, Aprovado, Rejeitado
+    val status: String = "Pendente",
     val observacoes: String = "",
     val timestamp: Long = System.currentTimeMillis()
 )
