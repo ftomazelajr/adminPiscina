@@ -16,6 +16,7 @@ import com.tomazela.adminpiscina.ui.pdv.PdvFragment
 import com.tomazela.adminpiscina.ui.produtos.ProdutosFragment
 import com.tomazela.adminpiscina.ui.recebimentos.RecebimentosFragment
 import com.tomazela.adminpiscina.ui.servicos.ServicosFragment
+import com.tomazela.adminpiscina.ui.visita.VisitaFragment
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -69,6 +70,10 @@ class MainActivity : AppCompatActivity() {
 
     fun onRecebimentosClick(view: View) {
         loadFragment(RecebimentosFragment())
+    }
+
+    fun onVisitaClick(view: View) {
+        loadFragment(VisitaFragment())
     }
 
     private fun navigateToLogin() {
