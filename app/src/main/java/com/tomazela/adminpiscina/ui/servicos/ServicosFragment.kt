@@ -20,8 +20,6 @@ class ServicosFragment : Fragment() {
     
     private val servicosPendentes = mutableListOf<Servico>()
     private val servicosAprovados = mutableListOf<Servico>()
-    private var listenerPendentes: ChildEventListener? = null
-    private var listenerAprovados: ChildEventListener? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,7 +37,8 @@ class ServicosFragment : Fragment() {
 
         setupRecyclerView()
         setupTabs()
-        carregarServicos()
+        carregarPendentes()
+        carregarAprovados()
     }
 
     private fun setupRecyclerView() {
@@ -49,6 +48,7 @@ class ServicosFragment : Fragment() {
         )
         binding.rvServicos.layoutManager = LinearLayoutManager(context)
         binding.rvServicos.adapter = adapter
+        binding.progressServicos.visibility = View.GONE
     }
 
     private fun setupTabs() {
@@ -84,132 +84,59 @@ class ServicosFragment : Fragment() {
         binding.tabLayout.getTabAt(0)?.select()
     }
 
-    private fun carregarServicos() {
-        binding.progressServicos.visibility = View.VISIBLE
-        carregarPendentes()
-        carregarAprovados()
-    }
-
     private fun carregarPendentes() {
-        // Remove listener antigo se existir
-        listenerPendentes?.let { database.child("pedidos_pendentes").removeEventListener(it) }
+        binding.progressServicos.visibility = View.VISIBLE
         
-        listenerPendentes = object : ChildEventListener {
-            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                try {
-                    val servico = snapshot.getValue(Servico::class.java)
-                    if (servico != null) {
-                        val servicoComId = servico.copy(id = snapshot.key ?: "")
-                        if (servicoComId.clienteNome.isNotEmpty()) {
-                            servicosPendentes.add(servicoComId)
-                            if (binding.tabLayout.selectedTabPosition == 0) {
-                                adapter.submitList(servicosPendentes.sortedByDescending { it.timestamp })
-                            }
-                            binding.progressServicos.visibility = View.GONE
+        database.child("pedidos_pendentes").addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                servicosPendentes.clear()
+                snapshot.children.forEach { child ->
+                    val servico = child.getValue(Servico::class.java)?.copy(id = child.key ?: "")
+                    servico?.let {
+                        if (it.clienteNome.isNotEmpty()) {
+                            servicosPendentes.add(it)
                         }
                     }
-                } catch (e: Exception) {
-                    e.printStackTrace()
                 }
-            }
-
-            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                try {
-                    val servico = snapshot.getValue(Servico::class.java)
-                    if (servico != null) {
-                        val servicoComId = servico.copy(id = snapshot.key ?: "")
-                        val index = servicosPendentes.indexOfFirst { it.id == servicoComId.id }
-                        if (index != -1) {
-                            servicosPendentes[index] = servicoComId
-                            if (binding.tabLayout.selectedTabPosition == 0) {
-                                adapter.submitList(servicosPendentes.sortedByDescending { it.timestamp })
-                            }
-                        }
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-
-            override fun onChildRemoved(snapshot: DataSnapshot) {
-                servicosPendentes.removeAll { it.id == snapshot.key }
-                if (binding.tabLayout.selectedTabPosition == 0) {
-                    adapter.submitList(servicosPendentes.sortedByDescending { it.timestamp })
-                }
+                adapter.submitList(servicosPendentes.sortedByDescending { it.timestamp })
+                binding.progressServicos.visibility = View.GONE
+                
+                // Se não houver dados, mostrar mensagem
                 if (servicosPendentes.isEmpty()) {
-                    binding.progressServicos.visibility = View.GONE
+                    Toast.makeText(context, "Nenhum pedido pendente", Toast.LENGTH_SHORT).show()
                 }
             }
 
-            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
             override fun onCancelled(error: DatabaseError) {
                 binding.progressServicos.visibility = View.GONE
                 Toast.makeText(context, "Erro ao carregar pendentes: ${error.message}", Toast.LENGTH_SHORT).show()
             }
-        }
-
-        database.child("pedidos_pendentes").addChildEventListener(listenerPendentes!!)
+        })
     }
 
     private fun carregarAprovados() {
-        // Remove listener antigo se existir
-        listenerAprovados?.let { database.child("pedidos").removeEventListener(it) }
-        
-        listenerAprovados = object : ChildEventListener {
-            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                try {
-                    val servico = snapshot.getValue(Servico::class.java)
-                    if (servico != null) {
-                        val servicoComId = servico.copy(id = snapshot.key ?: "")
-                        if (servicoComId.clienteNome.isNotEmpty()) {
-                            servicosAprovados.add(servicoComId)
-                            if (binding.tabLayout.selectedTabPosition == 1) {
-                                adapter.submitList(servicosAprovados.sortedByDescending { it.timestamp })
-                            }
-                            binding.progressServicos.visibility = View.GONE
+        database.child("pedidos").addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                servicosAprovados.clear()
+                snapshot.children.forEach { child ->
+                    val servico = child.getValue(Servico::class.java)?.copy(id = child.key ?: "")
+                    servico?.let {
+                        if (it.clienteNome.isNotEmpty()) {
+                            servicosAprovados.add(it)
                         }
                     }
-                } catch (e: Exception) {
-                    e.printStackTrace()
                 }
-            }
-
-            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                try {
-                    val servico = snapshot.getValue(Servico::class.java)
-                    if (servico != null) {
-                        val servicoComId = servico.copy(id = snapshot.key ?: "")
-                        val index = servicosAprovados.indexOfFirst { it.id == servicoComId.id }
-                        if (index != -1) {
-                            servicosAprovados[index] = servicoComId
-                            if (binding.tabLayout.selectedTabPosition == 1) {
-                                adapter.submitList(servicosAprovados.sortedByDescending { it.timestamp })
-                            }
-                        }
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-
-            override fun onChildRemoved(snapshot: DataSnapshot) {
-                servicosAprovados.removeAll { it.id == snapshot.key }
                 if (binding.tabLayout.selectedTabPosition == 1) {
                     adapter.submitList(servicosAprovados.sortedByDescending { it.timestamp })
                 }
-                if (servicosAprovados.isEmpty()) {
-                    binding.progressServicos.visibility = View.GONE
-                }
+                binding.progressServicos.visibility = View.GONE
             }
 
-            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
             override fun onCancelled(error: DatabaseError) {
                 binding.progressServicos.visibility = View.GONE
                 Toast.makeText(context, "Erro ao carregar aprovados: ${error.message}", Toast.LENGTH_SHORT).show()
             }
-        }
-
-        database.child("pedidos").addChildEventListener(listenerAprovados!!)
+        })
     }
 
     private fun aprovarServico(servico: Servico) {
@@ -221,9 +148,7 @@ class ServicosFragment : Fragment() {
                     .addOnSuccessListener {
                         servicosPendentes.removeAll { it.id == servico.id }
                         Toast.makeText(context, "Serviço aprovado!", Toast.LENGTH_SHORT).show()
-                        if (binding.tabLayout.selectedTabPosition == 0) {
-                            adapter.submitList(servicosPendentes.sortedByDescending { it.timestamp })
-                        }
+                        adapter.submitList(servicosPendentes.sortedByDescending { it.timestamp })
                     }
             }
             .addOnFailureListener {
@@ -236,9 +161,7 @@ class ServicosFragment : Fragment() {
             .addOnSuccessListener {
                 servicosPendentes.removeAll { it.id == servico.id }
                 Toast.makeText(context, "Serviço rejeitado", Toast.LENGTH_SHORT).show()
-                if (binding.tabLayout.selectedTabPosition == 0) {
-                    adapter.submitList(servicosPendentes.sortedByDescending { it.timestamp })
-                }
+                adapter.submitList(servicosPendentes.sortedByDescending { it.timestamp })
             }
             .addOnFailureListener {
                 Toast.makeText(context, "Erro ao rejeitar: ${it.message}", Toast.LENGTH_SHORT).show()
@@ -247,8 +170,6 @@ class ServicosFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        listenerPendentes?.let { database.child("pedidos_pendentes").removeEventListener(it) }
-        listenerAprovados?.let { database.child("pedidos").removeEventListener(it) }
         _binding = null
     }
 }

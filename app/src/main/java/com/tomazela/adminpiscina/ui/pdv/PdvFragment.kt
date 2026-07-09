@@ -29,6 +29,7 @@ class PdvFragment : Fragment() {
     private val servicos = mutableListOf<Produto>()
     private val carrinho = mutableListOf<ItemPedido>()
     private var clienteSelecionado: Cliente? = null
+    private val clientes = mutableListOf<Cliente>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,6 +50,7 @@ class PdvFragment : Fragment() {
         setupTabs()
         carregarProdutos()
         carregarServicos()
+        carregarClientes()
     }
 
     private fun setupRecyclerViews() {
@@ -102,7 +104,7 @@ class PdvFragment : Fragment() {
         binding.etBuscarCliente.addTextChangedListener(object : android.text.TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                filtrarClientes(s.toString())
+                buscarCliente(s.toString())
             }
             override fun afterTextChanged(s: android.text.Editable?) {}
         })
@@ -114,6 +116,54 @@ class PdvFragment : Fragment() {
         binding.btnFinalizar.setOnClickListener {
             finalizarVenda()
         }
+    }
+
+    private fun carregarClientes() {
+        database.child("clientes").addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                clientes.clear()
+                snapshot.children.forEach { child ->
+                    val cliente = child.getValue(Cliente::class.java)?.copy(id = child.key ?: "")
+                    cliente?.let { clientes.add(it) }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(context, "Erro ao carregar clientes", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun buscarCliente(query: String) {
+        if (query.isEmpty()) {
+            clienteSelecionado = null
+            binding.tvClienteSelecionado.text = "Nenhum cliente selecionado"
+            return
+        }
+
+        val clientesFiltrados = clientes.filter { 
+            it.nome.lowercase().contains(query.lowercase()) 
+        }.take(5)
+
+        if (clientesFiltrados.isEmpty()) {
+            binding.tvClienteSelecionado.text = "Nenhum cliente encontrado"
+            return
+        }
+
+        mostrarDialogClientes(clientesFiltrados)
+    }
+
+    private fun mostrarDialogClientes(clientes: List<Cliente>) {
+        val nomes = clientes.map { it.nome }.toTypedArray()
+        AlertDialog.Builder(requireContext())
+            .setTitle("Selecione um cliente")
+            .setItems(nomes) { _, which ->
+                clienteSelecionado = clientes[which]
+                binding.tvClienteSelecionado.text = "Cliente: ${clienteSelecionado?.nome}"
+                binding.etBuscarCliente.setText(clienteSelecionado?.nome)
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
     }
 
     private fun carregarProdutos() {
@@ -185,53 +235,6 @@ class PdvFragment : Fragment() {
             lista.filter { it.nome.lowercase().contains(query.lowercase()) }
         }
         produtosAdapter.submitList(filtrados.sortedBy { it.nome })
-    }
-
-    private fun filtrarClientes(query: String) {
-        if (query.isEmpty()) {
-            clienteSelecionado = null
-            binding.tvClienteSelecionado.text = "Nenhum cliente selecionado"
-            return
-        }
-
-        database.child("clientes")
-            .orderByChild("nome")
-            .startAt(query)
-            .endAt(query + "\uf8ff")
-            .limitToFirst(5)
-            .get()
-            .addOnSuccessListener { snapshot ->
-                if (snapshot.exists()) {
-                    val clientes = mutableListOf<Cliente>()
-                    snapshot.children.forEach { child ->
-                        child.getValue(Cliente::class.java)?.copy(id = child.key ?: "")?.let {
-                            clientes.add(it)
-                        }
-                    }
-                    mostrarDialogClientes(clientes, query)
-                }
-            }
-            .addOnFailureListener {
-                Toast.makeText(context, "Erro ao buscar clientes", Toast.LENGTH_SHORT).show()
-            }
-    }
-
-    private fun mostrarDialogClientes(clientes: List<Cliente>, query: String) {
-        if (clientes.isEmpty()) {
-            binding.tvClienteSelecionado.text = "Nenhum cliente encontrado"
-            return
-        }
-
-        val nomes = clientes.map { it.nome }.toTypedArray()
-        AlertDialog.Builder(requireContext())
-            .setTitle("Selecione um cliente")
-            .setItems(nomes) { _, which ->
-                clienteSelecionado = clientes[which]
-                binding.tvClienteSelecionado.text = "Cliente: ${clienteSelecionado?.nome}"
-                binding.etBuscarCliente.setText(clienteSelecionado?.nome)
-            }
-            .setNegativeButton("Cancelar", null)
-            .show()
     }
 
     private fun adicionarAoCarrinho(produto: Produto) {
