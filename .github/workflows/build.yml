@@ -19,36 +19,17 @@ jobs:
         distribution: 'temurin'
 
     - name: Setup Android SDK
-      run: |
-        export ANDROID_HOME=$HOME/android-sdk
-        export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
-        
-        mkdir -p $ANDROID_HOME/cmdline-tools
-        wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip
-        unzip -q cmdline-tools.zip -d $ANDROID_HOME/cmdline-tools
-        mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
-        
-        # Aceitar todas as licenças
-        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null 2>&1 || true
-        
-        # Instalar as plataformas necessárias
-        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-35" "build-tools;34.0.0" > /dev/null 2>&1 || true
-        
-        echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
-        echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> $GITHUB_PATH
-        echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
+      uses: android-actions/setup-android@v3
 
     - name: Create local.properties
       run: |
-        echo "sdk.dir=$HOME/android-sdk" > local.properties
+        echo "sdk.dir=$ANDROID_HOME" > local.properties
 
     - name: Make gradlew executable
       run: chmod +x gradlew
 
     - name: Build APK
       run: |
-        export ANDROID_HOME=$HOME/android-sdk
-        export ANDROID_SDK_ROOT=$HOME/android-sdk
         ./gradlew assembleDebug
 
     - name: Upload APK
