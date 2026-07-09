@@ -20,8 +20,6 @@ class ServicosFragment : Fragment() {
     
     private val servicosPendentes = mutableListOf<Servico>()
     private val servicosAprovados = mutableListOf<Servico>()
-    private var listenerPendentes: ChildEventListener? = null
-    private var listenerAprovados: ChildEventListener? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,8 +53,14 @@ class ServicosFragment : Fragment() {
         binding.tabLayout.addOnTabSelectedListener(object : com.google.android.material.tabs.TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: com.google.android.material.tabs.TabLayout.Tab?) {
                 when (tab?.position) {
-                    0 -> adapter.submitList(servicosPendentes.sortedByDescending { it.timestamp })
-                    1 -> adapter.submitList(servicosAprovados.sortedByDescending { it.timestamp })
+                    0 -> {
+                        adapter.submitList(servicosPendentes.sortedByDescending { it.timestamp })
+                        binding.progressServicos.visibility = View.GONE
+                    }
+                    1 -> {
+                        adapter.submitList(servicosAprovados.sortedByDescending { it.timestamp })
+                        binding.progressServicos.visibility = View.GONE
+                    }
                 }
             }
 
@@ -69,14 +73,18 @@ class ServicosFragment : Fragment() {
         binding.progressServicos.visibility = View.VISIBLE
 
         // Carregar pedidos pendentes
-        listenerPendentes = database.child("pedidos_pendentes")
+        database.child("pedidos_pendentes")
             .addChildEventListener(object : ChildEventListener {
                 override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                     val servico = snapshot.getValue(Servico::class.java)?.copy(id = snapshot.key ?: "")
                     servico?.let {
-                        servicosPendentes.add(it)
-                        if (binding.tabLayout.selectedTabPosition == 0) {
-                            adapter.submitList(servicosPendentes.sortedByDescending { it.timestamp })
+                        // Garantir que o nome do cliente está correto
+                        if (it.clienteNome.isNotEmpty()) {
+                            servicosPendentes.add(it)
+                            if (binding.tabLayout.selectedTabPosition == 0) {
+                                adapter.submitList(servicosPendentes.sortedByDescending { it.timestamp })
+                            }
+                            binding.progressServicos.visibility = View.GONE
                         }
                     }
                 }
@@ -108,17 +116,19 @@ class ServicosFragment : Fragment() {
             })
 
         // Carregar pedidos aprovados
-        listenerAprovados = database.child("pedidos")
+        database.child("pedidos")
             .addChildEventListener(object : ChildEventListener {
                 override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                     val servico = snapshot.getValue(Servico::class.java)?.copy(id = snapshot.key ?: "")
                     servico?.let {
-                        servicosAprovados.add(it)
-                        if (binding.tabLayout.selectedTabPosition == 1) {
-                            adapter.submitList(servicosAprovados.sortedByDescending { it.timestamp })
+                        if (it.clienteNome.isNotEmpty()) {
+                            servicosAprovados.add(it)
+                            if (binding.tabLayout.selectedTabPosition == 1) {
+                                adapter.submitList(servicosAprovados.sortedByDescending { it.timestamp })
+                            }
+                            binding.progressServicos.visibility = View.GONE
                         }
                     }
-                    binding.progressServicos.visibility = View.GONE
                 }
 
                 override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
@@ -142,12 +152,13 @@ class ServicosFragment : Fragment() {
                 }
 
                 override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
-                override fun onCancelled(error: DatabaseError) {}
+                override fun onCancelled(error: DatabaseError) {
+                    binding.progressServicos.visibility = View.GONE
+                }
             })
     }
 
     private fun aprovarServico(servico: Servico) {
-        // Mover para pedidos aprovados
         val servicoAprovado = servico.copy(status = "Aprovado")
         
         database.child("pedidos").push().setValue(servicoAprovado)
@@ -174,8 +185,6 @@ class ServicosFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        listenerPendentes?.let { database.child("pedidos_pendentes").removeEventListener(it) }
-        listenerAprovados?.let { database.child("pedidos").removeEventListener(it) }
         _binding = null
     }
 }

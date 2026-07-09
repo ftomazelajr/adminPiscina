@@ -26,6 +26,7 @@ class PdvFragment : Fragment() {
     private lateinit var carrinhoAdapter: CarrinhoAdapter
     
     private val produtos = mutableListOf<Produto>()
+    private val servicos = mutableListOf<Produto>()
     private val carrinho = mutableListOf<ItemPedido>()
     private var clienteSelecionado: Cliente? = null
 
@@ -45,13 +46,14 @@ class PdvFragment : Fragment() {
 
         setupRecyclerViews()
         setupListeners()
+        setupTabs()
         carregarProdutos()
-        carregarClientes()
+        carregarServicos()
     }
 
     private fun setupRecyclerViews() {
-        produtosAdapter = ProdutoPdvAdapter { produto ->
-            adicionarAoCarrinho(produto)
+        produtosAdapter = ProdutoPdvAdapter { item ->
+            adicionarAoCarrinho(item)
         }
         binding.rvProdutos.layoutManager = LinearLayoutManager(context)
         binding.rvProdutos.adapter = produtosAdapter
@@ -68,11 +70,31 @@ class PdvFragment : Fragment() {
         binding.rvCarrinho.adapter = carrinhoAdapter
     }
 
+    private fun setupTabs() {
+        binding.tabItens.addOnTabSelectedListener(object : com.google.android.material.tabs.TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: com.google.android.material.tabs.TabLayout.Tab?) {
+                when (tab?.position) {
+                    0 -> {
+                        produtosAdapter.submitList(produtos.sortedBy { it.nome })
+                        binding.etBuscarProduto.hint = "Buscar produto..."
+                    }
+                    1 -> {
+                        produtosAdapter.submitList(servicos.sortedBy { it.nome })
+                        binding.etBuscarProduto.hint = "Buscar serviço..."
+                    }
+                }
+            }
+
+            override fun onTabUnselected(tab: com.google.android.material.tabs.TabLayout.Tab?) {}
+            override fun onTabReselected(tab: com.google.android.material.tabs.TabLayout.Tab?) {}
+        })
+    }
+
     private fun setupListeners() {
         binding.etBuscarProduto.addTextChangedListener(object : android.text.TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                filtrarProdutos(s.toString())
+                filtrarItens(s.toString())
             }
             override fun afterTextChanged(s: android.text.Editable?) {}
         })
@@ -101,12 +123,14 @@ class PdvFragment : Fragment() {
                 snapshot.children.forEach { child ->
                     val produto = child.getValue(Produto::class.java)?.copy(id = child.key ?: "")
                     produto?.let {
-                        if (!it.pausado) {
+                        if (!it.pausado && it.tipo != "servico") {
                             produtos.add(it)
                         }
                     }
                 }
-                produtosAdapter.submitList(produtos.sortedBy { it.nome })
+                if (binding.tabItens.selectedTabPosition == 0) {
+                    produtosAdapter.submitList(produtos.sortedBy { it.nome })
+                }
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -115,23 +139,51 @@ class PdvFragment : Fragment() {
         })
     }
 
-    private fun carregarClientes() {
-        database.child("clientes").addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                // Só para autocomplete, não precisa armazenar
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                // Ignorar
-            }
-        })
+    private fun carregarServicos() {
+        // Serviços avulsos fixos
+        servicos.clear()
+        servicos.add(Produto(
+            id = "s1",
+            nome = "Visita Técnica",
+            preco = 80.0,
+            tipo = "servico"
+        ))
+        servicos.add(Produto(
+            id = "s2",
+            nome = "Limpeza Avulsa",
+            preco = 120.0,
+            tipo = "servico"
+        ))
+        servicos.add(Produto(
+            id = "s3",
+            nome = "Troca de Areia",
+            preco = 250.0,
+            tipo = "servico"
+        ))
+        servicos.add(Produto(
+            id = "s4",
+            nome = "Tratamento de Choque",
+            preco = 150.0,
+            tipo = "servico"
+        ))
+        servicos.add(Produto(
+            id = "s5",
+            nome = "Cobrança de Mensalidade",
+            preco = 0.0,
+            tipo = "servico"
+        ))
+        
+        if (binding.tabItens.selectedTabPosition == 1) {
+            produtosAdapter.submitList(servicos.sortedBy { it.nome })
+        }
     }
 
-    private fun filtrarProdutos(query: String) {
+    private fun filtrarItens(query: String) {
+        val lista = if (binding.tabItens.selectedTabPosition == 0) produtos else servicos
         val filtrados = if (query.isEmpty()) {
-            produtos
+            lista
         } else {
-            produtos.filter { it.nome.lowercase().contains(query.lowercase()) }
+            lista.filter { it.nome.lowercase().contains(query.lowercase()) }
         }
         produtosAdapter.submitList(filtrados.sortedBy { it.nome })
     }
