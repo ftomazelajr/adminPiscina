@@ -12,7 +12,9 @@
         android:background="@color/surface_dark"
         app:layout_constraintTop_toTopOf="parent"
         app:title="Admin Piscina"
-        app:titleTextColor="@color/white">
+        app:titleTextColor="@color/white"
+        app:navigationIcon="@drawable/ic_voltar"
+        app:navigationIconTint="@color/white">
 
         <TextView
             android:layout_width="wrap_content"

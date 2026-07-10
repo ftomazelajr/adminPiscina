@@ -2,6 +2,7 @@ package com.tomazela.adminpiscina
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -21,6 +22,7 @@ import com.tomazela.adminpiscina.ui.visita.VisitaFragment
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var auth: FirebaseAuth
+    private var currentFragment: Fragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,13 +36,45 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        loadFragment(DashboardFragment())
+        // Configurar toolbar
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(false)
+        supportActionBar?.title = "Dashboard"
+
+        // Carregar o DashboardFragment
+        loadFragment(DashboardFragment(), "Dashboard")
     }
 
-    private fun loadFragment(fragment: Fragment) {
+    fun loadFragment(fragment: Fragment, title: String) {
+        currentFragment = fragment
+        supportActionBar?.title = title
+        
+        // Mostrar botão de voltar se não for o Dashboard
+        supportActionBar?.setDisplayHomeAsUpEnabled(fragment !is DashboardFragment)
+        
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, fragment)
             .commit()
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                onBackPressed()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onBackPressed() {
+        if (currentFragment is DashboardFragment) {
+            // Se estiver no Dashboard, pode sair
+            super.onBackPressed()
+        } else {
+            // Voltar para o Dashboard
+            loadFragment(DashboardFragment(), "Dashboard")
+        }
     }
 
     fun onLogoutClick(view: View) {
@@ -49,31 +83,31 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onClientesClick(view: View) {
-        loadFragment(ClientesFragment())
+        loadFragment(ClientesFragment(), "Clientes")
     }
 
     fun onProdutosClick(view: View) {
-        loadFragment(ProdutosFragment())
+        loadFragment(ProdutosFragment(), "Produtos")
     }
 
     fun onPdvClick(view: View) {
-        loadFragment(PdvFragment())
+        loadFragment(PdvFragment(), "PDV")
     }
 
     fun onServicosClick(view: View) {
-        loadFragment(ServicosFragment())
-    }
-
-    fun onFaturamentoClick(view: View) {
-        loadFragment(FaturamentoFragment())
-    }
-
-    fun onRecebimentosClick(view: View) {
-        loadFragment(RecebimentosFragment())
+        loadFragment(ServicosFragment(), "Serviços")
     }
 
     fun onVisitaClick(view: View) {
-        loadFragment(VisitaFragment())
+        loadFragment(VisitaFragment(), "Ficha de Visita")
+    }
+
+    fun onFaturamentoClick(view: View) {
+        loadFragment(FaturamentoFragment(), "Faturamento")
+    }
+
+    fun onRecebimentosClick(view: View) {
+        loadFragment(RecebimentosFragment(), "Recebimentos")
     }
 
     private fun navigateToLogin() {

@@ -45,10 +45,6 @@ class PdvFragment : Fragment() {
 
         database = FirebaseDatabase.getInstance().getReference()
 
-        binding.btnVoltar.setOnClickListener {
-            activity?.onBackPressed()
-        }
-
         setupRecyclerViews()
         setupListeners()
         setupTabs()
@@ -145,7 +141,7 @@ class PdvFragment : Fragment() {
         if (query.isEmpty()) {
             clienteSelecionado = null
             binding.tvClienteSelecionado.text = "Nenhum cliente selecionado"
-            binding.tvClienteSelecionado.setTextColor(resources.getColor(R.color.warning_orange))
+            binding.tvClienteSelecionado.setTextColor(requireContext().getColor(R.color.warning_orange))
             return
         }
 
@@ -155,7 +151,7 @@ class PdvFragment : Fragment() {
 
         if (clientesFiltrados.isEmpty()) {
             binding.tvClienteSelecionado.text = "Nenhum cliente encontrado"
-            binding.tvClienteSelecionado.setTextColor(resources.getColor(R.color.danger_red))
+            binding.tvClienteSelecionado.setTextColor(requireContext().getColor(R.color.danger_red))
             return
         }
 
@@ -169,7 +165,7 @@ class PdvFragment : Fragment() {
             .setItems(nomes) { _, which ->
                 clienteSelecionado = clientes[which]
                 binding.tvClienteSelecionado.text = "✅ ${clienteSelecionado?.nome}"
-                binding.tvClienteSelecionado.setTextColor(resources.getColor(R.color.success_green))
+                binding.tvClienteSelecionado.setTextColor(requireContext().getColor(R.color.success_green))
                 binding.etBuscarCliente.setText(clienteSelecionado?.nome)
             }
             .setNegativeButton("Cancelar", null)
@@ -292,10 +288,7 @@ class PdvFragment : Fragment() {
     }
 
     private fun atualizarCarrinho() {
-        // Atualizar o adapter
         carrinhoAdapter.submitList(carrinho)
-        
-        // Calcular o total corretamente
         val total = carrinho.sumOf { it.precoUnitario * it.quantidade }
         val formatador = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))
         binding.tvTotal.text = formatador.format(total)
@@ -344,7 +337,7 @@ class PdvFragment : Fragment() {
                 limparCarrinho()
                 clienteSelecionado = null
                 binding.tvClienteSelecionado.text = "Nenhum cliente selecionado"
-                binding.tvClienteSelecionado.setTextColor(resources.getColor(R.color.warning_orange))
+                binding.tvClienteSelecionado.setTextColor(requireContext().getColor(R.color.warning_orange))
                 binding.etBuscarCliente.setText("")
             }
             .addOnFailureListener { e ->

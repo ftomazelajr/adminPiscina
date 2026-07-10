@@ -4,46 +4,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/primary_blue_dark">
+    android:background="@color/primary_blue_dark"
+    android:padding="12dp">
 
-    <!-- Header com botão voltar -->
-    <androidx.appcompat.widget.Toolbar
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/surface_dark"
-        android:elevation="4dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <ImageButton
-                android:id="@+id/btnVoltar"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:src="@drawable/ic_voltar"
-                android:background="@null"
-                android:contentDescription="Voltar"
-                android:onClick="onVoltarClick" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="✍️ Ponto de Venda"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="@color/white"
-                android:gravity="center" />
-        </LinearLayout>
-    </androidx.appcompat.widget.Toolbar>
+        android:layout_height="wrap_content"
+        android:text="✍️ PDV - Ponto de Venda"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:layout_marginBottom="12dp" />
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="12dp">
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -100,8 +75,7 @@
                         android:layout_marginTop="8dp"
                         android:padding="8dp"
                         android:background="@color/surface_light"
-                        android:gravity="center"
-                        android:visibility="visible" />
+                        android:gravity="center" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -129,7 +103,6 @@
                         android:textStyle="bold"
                         android:layout_marginBottom="8dp" />
 
-                    <!-- Tabs -->
                     <com.google.android.material.tabs.TabLayout
                         android:id="@+id/tabItens"
                         android:layout_width="match_parent"
@@ -139,8 +112,7 @@
                         app:tabIndicatorColor="@color/accent_blue"
                         app:tabBackground="@color/surface_light"
                         app:tabMode="fixed"
-                        app:tabGravity="fill"
-                        app:tabRippleColor="@null">
+                        app:tabGravity="fill">
 
                         <com.google.android.material.tabs.TabItem
                             android:layout_width="wrap_content"
@@ -254,7 +226,6 @@
                     android:text="LIMPAR"
                     android:textAllCaps="true"
                     android:textSize="14sp"
-                    android:letterSpacing="0.1"
                     app:backgroundTint="@color/danger_red"
                     app:cornerRadius="12dp"
                     android:layout_marginEnd="8dp" />
@@ -267,7 +238,6 @@
                     android:text="FINALIZAR"
                     android:textAllCaps="true"
                     android:textSize="14sp"
-                    android:letterSpacing="0.1"
                     app:backgroundTint="@color/success_green"
                     app:cornerRadius="12dp" />
             </LinearLayout>
