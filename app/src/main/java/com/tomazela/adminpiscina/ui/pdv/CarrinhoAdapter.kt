@@ -53,11 +53,8 @@ class CarrinhoAdapter(
             
             binding.tvQuantidade.text = item.quantidade.toString()
 
-            // Remover listener antigo para evitar duplicação
-            binding.etPrecoUnitario.removeTextChangedListener(precoWatcher)
-            
-            // Adicionar novo listener
-            binding.etPrecoUnitario.addTextChangedListener(object : TextWatcher {
+            // Criar um TextWatcher local
+            val watcher = object : TextWatcher {
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                 
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -87,7 +84,11 @@ class CarrinhoAdapter(
                         isUpdating = false
                     }
                 }
-            })
+            }
+
+            // Remover listeners antigos e adicionar o novo
+            binding.etPrecoUnitario.removeTextChangedListener(watcher)
+            binding.etPrecoUnitario.addTextChangedListener(watcher)
 
             binding.btnRemover.setOnClickListener {
                 if (item.quantidade > 1) {
