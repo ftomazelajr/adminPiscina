@@ -52,14 +52,23 @@ class RecebimentosFragment : Fragment() {
         binding.tabLayout.addOnTabSelectedListener(object : com.google.android.material.tabs.TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: com.google.android.material.tabs.TabLayout.Tab?) {
                 when (tab?.position) {
-                    0 -> adapter.submitList(recebimentosPendentes.sortedByDescending { it.dataFechamento })
-                    1 -> adapter.submitList(recebimentosPagos.sortedByDescending { it.dataFechamento })
+                    0 -> {
+                        adapter.submitList(recebimentosPendentes.sortedByDescending { it.dataFechamento })
+                        binding.progressRecebimentos.visibility = View.GONE
+                    }
+                    1 -> {
+                        adapter.submitList(recebimentosPagos.sortedByDescending { it.dataFechamento })
+                        binding.progressRecebimentos.visibility = View.GONE
+                    }
                 }
             }
 
             override fun onTabUnselected(tab: com.google.android.material.tabs.TabLayout.Tab?) {}
             override fun onTabReselected(tab: com.google.android.material.tabs.TabLayout.Tab?) {}
         })
+        
+        // Selecionar a primeira tab por padrão
+        binding.tabLayout.getTabAt(0)?.select()
     }
 
     private fun carregarRecebimentos() {
@@ -71,13 +80,18 @@ class RecebimentosFragment : Fragment() {
                 recebimentosPagos.clear()
 
                 snapshot.children.forEach { child ->
-                    val fatura = child.getValue(Fatura::class.java)?.copy(id = child.key ?: "")
-                    fatura?.let {
-                        if (it.status == "Pendente") {
-                            recebimentosPendentes.add(it)
-                        } else {
-                            recebimentosPagos.add(it)
+                    try {
+                        val fatura = child.getValue(Fatura::class.java)
+                        if (fatura != null) {
+                            val faturaComId = fatura.copy(id = child.key ?: "")
+                            if (faturaComId.status == "Pendente") {
+                                recebimentosPendentes.add(faturaComId)
+                            } else {
+                                recebimentosPagos.add(faturaComId)
+                            }
                         }
+                    } catch (e: Exception) {
+                        // Ignorar itens com erro
                     }
                 }
 
@@ -88,7 +102,7 @@ class RecebimentosFragment : Fragment() {
 
             override fun onCancelled(error: DatabaseError) {
                 binding.progressRecebimentos.visibility = View.GONE
-                Toast.makeText(context, "Erro ao carregar recebimentos", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Erro ao carregar recebimentos: ${error.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }

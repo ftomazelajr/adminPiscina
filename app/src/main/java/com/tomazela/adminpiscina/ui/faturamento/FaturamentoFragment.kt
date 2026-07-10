@@ -59,14 +59,19 @@ class FaturamentoFragment : Fragment() {
                 totalPago = 0.0
 
                 snapshot.children.forEach { child ->
-                    val fatura = child.getValue(Fatura::class.java)?.copy(id = child.key ?: "")
-                    fatura?.let {
-                        faturas.add(it)
-                        if (it.status == "Pendente") {
-                            totalPendente += it.totalFatura
-                        } else {
-                            totalPago += it.totalFatura
+                    try {
+                        val fatura = child.getValue(Fatura::class.java)
+                        if (fatura != null) {
+                            val faturaComId = fatura.copy(id = child.key ?: "")
+                            faturas.add(faturaComId)
+                            if (faturaComId.status == "Pendente") {
+                                totalPendente += faturaComId.totalFatura
+                            } else {
+                                totalPago += faturaComId.totalFatura
+                            }
                         }
+                    } catch (e: Exception) {
+                        // Ignorar itens com erro
                     }
                 }
 
@@ -77,7 +82,7 @@ class FaturamentoFragment : Fragment() {
 
             override fun onCancelled(error: DatabaseError) {
                 binding.progressFaturamento.visibility = View.GONE
-                Toast.makeText(context, "Erro ao carregar faturas", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Erro ao carregar faturas: ${error.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }

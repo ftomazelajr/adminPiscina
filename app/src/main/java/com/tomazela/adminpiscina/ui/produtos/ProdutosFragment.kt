@@ -72,8 +72,15 @@ class ProdutosFragment : Fragment() {
             override fun onDataChange(snapshot: DataSnapshot) {
                 produtos.clear()
                 snapshot.children.forEach { child ->
-                    val produto = child.getValue(Produto::class.java)?.copy(id = child.key ?: "")
-                    produto?.let { produtos.add(it) }
+                    try {
+                        val produto = child.getValue(Produto::class.java)
+                        if (produto != null) {
+                            val produtoComId = produto.copy(id = child.key ?: "")
+                            produtos.add(produtoComId)
+                        }
+                    } catch (e: Exception) {
+                        // Ignorar itens com erro
+                    }
                 }
                 adapter.submitList(produtos.sortedBy { it.nome })
                 binding.progressProdutos.visibility = View.GONE
@@ -81,7 +88,7 @@ class ProdutosFragment : Fragment() {
 
             override fun onCancelled(error: DatabaseError) {
                 binding.progressProdutos.visibility = View.GONE
-                Toast.makeText(context, "Erro ao carregar produtos", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Erro ao carregar produtos: ${error.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -109,7 +116,7 @@ class ProdutosFragment : Fragment() {
             produtoEditando = it
             dialogView.etNome.setText(it.nome)
             dialogView.etPreco.setText(it.preco.toString())
-            dialogView.etDescricao.setText(it.descricao)
+            dialogView.etDescricao.setText(it.descricao ?: "")
             dialogView.switchPausado.isChecked = it.pausado
         }
 
@@ -153,7 +160,7 @@ class ProdutosFragment : Fragment() {
                 Toast.makeText(context, "Produto adicionado!", Toast.LENGTH_SHORT).show()
             }
             .addOnFailureListener {
-                Toast.makeText(context, "Erro ao adicionar produto", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Erro ao adicionar produto: ${it.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
@@ -164,7 +171,7 @@ class ProdutosFragment : Fragment() {
                     Toast.makeText(context, "Produto atualizado!", Toast.LENGTH_SHORT).show()
                 }
                 .addOnFailureListener {
-                    Toast.makeText(context, "Erro ao atualizar produto", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Erro ao atualizar produto: ${it.message}", Toast.LENGTH_SHORT).show()
                 }
         }
     }
@@ -180,7 +187,7 @@ class ProdutosFragment : Fragment() {
                             Toast.makeText(context, "Produto excluído!", Toast.LENGTH_SHORT).show()
                         }
                         .addOnFailureListener {
-                            Toast.makeText(context, "Erro ao excluir produto", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Erro ao excluir produto: ${it.message}", Toast.LENGTH_SHORT).show()
                         }
                 }
             }

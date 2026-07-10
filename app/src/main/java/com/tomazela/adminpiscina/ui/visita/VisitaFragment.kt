@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.google.firebase.database.*
@@ -84,7 +83,7 @@ class VisitaFragment : Fragment() {
         if (query.isEmpty()) {
             clienteSelecionado = null
             binding.tvClienteSelecionadoVisita.text = "Nenhum cliente selecionado"
-            binding.tvClienteSelecionadoVisita.setTextColor(resources.getColor(R.color.warning_orange))
+            binding.tvClienteSelecionadoVisita.setTextColor(requireContext().getColor(R.color.warning_orange))
             return
         }
 
@@ -94,7 +93,7 @@ class VisitaFragment : Fragment() {
 
         if (clientesFiltrados.isEmpty()) {
             binding.tvClienteSelecionadoVisita.text = "Nenhum cliente encontrado"
-            binding.tvClienteSelecionadoVisita.setTextColor(resources.getColor(R.color.danger_red))
+            binding.tvClienteSelecionadoVisita.setTextColor(requireContext().getColor(R.color.danger_red))
             return
         }
 
@@ -108,7 +107,7 @@ class VisitaFragment : Fragment() {
             .setItems(nomes) { _, which ->
                 clienteSelecionado = clientes[which]
                 binding.tvClienteSelecionadoVisita.text = "✅ ${clienteSelecionado?.nome}"
-                binding.tvClienteSelecionadoVisita.setTextColor(resources.getColor(R.color.success_green))
+                binding.tvClienteSelecionadoVisita.setTextColor(requireContext().getColor(R.color.success_green))
                 binding.etBuscarClienteVisita.setText(clienteSelecionado?.nome)
             }
             .setNegativeButton("Cancelar", null)
@@ -175,14 +174,16 @@ class VisitaFragment : Fragment() {
             servicos = servicos,
             produtos = binding.etProdutos.text.toString().trim(),
             observacoes = binding.etObservacoes.text.toString().trim(),
-            status = "Pendente"
+            status = "Pendente",
+            timestamp = System.currentTimeMillis()
         )
 
+        // Salvar no nó visitas_pendentes para aprovação
         database.child("visitas_pendentes").push().setValue(visita)
             .addOnSuccessListener {
                 binding.progressVisita.visibility = View.GONE
                 binding.btnSalvarVisita.isEnabled = true
-                Toast.makeText(context, "✅ Visita enviada para aprovação!", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, "✅ Visita enviada para aprovação em Serviços!", Toast.LENGTH_LONG).show()
                 limparFormulario()
             }
             .addOnFailureListener { e ->
@@ -195,7 +196,7 @@ class VisitaFragment : Fragment() {
     private fun limparFormulario() {
         binding.etBuscarClienteVisita.setText("")
         binding.tvClienteSelecionadoVisita.text = "Nenhum cliente selecionado"
-        binding.tvClienteSelecionadoVisita.setTextColor(resources.getColor(R.color.warning_orange))
+        binding.tvClienteSelecionadoVisita.setTextColor(requireContext().getColor(R.color.warning_orange))
         clienteSelecionado = null
         
         val checkboxes = listOf(
