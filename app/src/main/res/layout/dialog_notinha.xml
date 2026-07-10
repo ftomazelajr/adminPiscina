@@ -34,7 +34,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="CNPJ: 12.345.678/0001-90"
+                android:text="CNPJ: 40.136.528/0001-07"
                 android:textSize="10sp"
                 android:textColor="#555555"
                 android:gravity="center"
@@ -52,6 +52,23 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Tel: (14) 98172-2063"
+                android:textSize="10sp"
+                android:textColor="#555555"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Email: tomazelapiscinas@gmail.com"
+                android:textSize="10sp"
+                android:textColor="#555555"
+                android:gravity="center"
+                android:layout_marginTop="2dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="📷 @tomazelapiscinas"
                 android:textSize="10sp"
                 android:textColor="#555555"
                 android:gravity="center" />
@@ -227,11 +244,20 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="www.tomazelapiscinas.com.br"
+                android:text="📷 @tomazelapiscinas"
                 android:textSize="10sp"
                 android:textColor="#555555"
                 android:gravity="center"
                 android:layout_marginTop="4dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="📧 tomazelapiscinas@gmail.com"
+                android:textSize="10sp"
+                android:textColor="#555555"
+                android:gravity="center"
+                android:layout_marginTop="2dp" />
 
             <TextView
                 android:layout_width="match_parent"

@@ -37,10 +37,8 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         dialog.setCancelable(true)
         
-        // Configurar dados da notinha
         configurarNotinha(dialog)
         
-        // Configurar botões
         val btnWhatsApp = dialog.findViewById<Button>(R.id.btnWhatsAppNotinha)
         btnWhatsApp?.setOnClickListener {
             compartilharWhatsApp()
@@ -145,9 +143,11 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
             ========================================
                    🏊 TOMAZELA PISCINAS
             ========================================
-            CNPJ: 12.345.678/0001-90
+            CNPJ: 40.136.528/0001-07
             Rua Romualdo Albino Balestrin, 35
             Tel: (14) 98172-2063
+            📷 @tomazelapiscinas
+            📧 tomazelapiscinas@gmail.com
             
             📅 DATA: $data
             👤 CLIENTE: ${servico.clienteNome}
@@ -165,6 +165,8 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
             ========================================
             Obrigado pela preferência!
             ========================================
+            📷 @tomazelapiscinas
+            📧 tomazelapiscinas@gmail.com
         """.trimIndent()
     }
 
@@ -172,18 +174,15 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
         try {
             val view = dialog.findViewById<LinearLayout>(R.id.llNotinha)
             
-            // Medir a view
             val widthSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
             val heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
             view.measure(widthSpec, heightSpec)
             view.layout(0, 0, view.measuredWidth, view.measuredHeight)
             
-            // Criar bitmap
             val bitmap = Bitmap.createBitmap(view.measuredWidth, view.measuredHeight, Bitmap.Config.ARGB_8888)
             val canvas = Canvas(bitmap)
             view.draw(canvas)
             
-            // Salvar
             val fileName = "notinha_${System.currentTimeMillis()}.png"
             val picturesDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
             if (picturesDir != null && !picturesDir.exists()) {
@@ -196,7 +195,6 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
             
             Toast.makeText(context, "✅ Notinha salva em: ${file.absolutePath}", Toast.LENGTH_LONG).show()
             
-            // Compartilhar
             val uri = FileProvider.getUriForFile(
                 context,
                 "${context.packageName}.fileprovider",
