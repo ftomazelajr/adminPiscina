@@ -19,6 +19,8 @@ import com.tomazela.adminpiscina.R
 import com.tomazela.adminpiscina.databinding.FragmentVisitaBinding
 import com.tomazela.adminpiscina.data.models.Cliente
 import com.tomazela.adminpiscina.data.models.Visita
+import com.tomazela.adminpiscina.utils.FirebaseHelper
+import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -27,7 +29,8 @@ import java.util.UUID
 class VisitaFragment : Fragment() {
     private var _binding: FragmentVisitaBinding? = null
     private val binding get() = _binding!!
-    private lateinit var database: DatabaseReference
+    private lateinit var databaseClientes: DatabaseReference
+    private lateinit var databaseVisitas: DatabaseReference
     private lateinit var storage: StorageReference
     private val clientes = mutableListOf<Cliente>()
     private var clienteSelecionado: Cliente? = null
@@ -39,12 +42,10 @@ class VisitaFragment : Fragment() {
     private var fotoAntesUrl: String? = null
     private var fotoDepoisUrl: String? = null
 
-    // Launcher para tirar foto
     private val tirarFotoLauncher = registerForActivityResult(
         ActivityResultContracts.TakePicture()
     ) { success ->
         if (success) {
-            // Foto tirada com sucesso
             Toast.makeText(context, "Foto salva!", Toast.LENGTH_SHORT).show()
         } else {
             Toast.makeText(context, "Erro ao tirar foto", Toast.LENGTH_SHORT).show()
@@ -63,7 +64,16 @@ class VisitaFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        database = FirebaseDatabase.getInstance().getReference()
+        val refClientes = FirebaseHelper.getUserNodeRef("clientes")
+        val refVisitas = FirebaseHelper.getUserNodeRef("visitas_pendentes")
+        
+        if (refClientes == null || refVisitas == null) {
+            Toast.makeText(context, "Usuário não logado", Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        databaseClientes = refClientes
+        databaseVisitas = refVisitas
         storage = FirebaseStorage.getInstance().reference
 
         setupListeners()
@@ -103,7 +113,6 @@ class VisitaFragment : Fragment() {
     private fun tirarFoto(tipo: String) {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         if (intent.resolveActivity(requireActivity().packageManager) != null) {
-            // Criar um arquivo temporário para a foto
             val photoFile = java.io.File(
                 requireContext().cacheDir,
                 "temp_${System.currentTimeMillis()}.jpg"
@@ -131,7 +140,7 @@ class VisitaFragment : Fragment() {
     }
 
     private fun carregarClientes() {
-        database.child("clientes").addListenerForSingleValueEvent(object : ValueEventListener {
+        databaseClientes.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 clientes.clear()
                 snapshot.children.forEach { child ->
@@ -200,29 +209,26 @@ class VisitaFragment : Fragment() {
         datePickerDialog.show()
     }
 
-    private fun uploadFoto(uri: Uri?, tipo: String): String? {
-        if (uri == null) return null
-
-        try {
-            val nomeArquivo = "visitas/${System.currentTimeMillis()}_${tipo}_${UUID.randomUUID()}.jpg"
-            val ref = storage.child(nomeArquivo)
-            
-            // Upload síncrono (bloqueante)
-            val uploadTask = ref.putFile(uri)
-            val taskSnapshot = uploadTask.await()
-            
-            // Pegar URL
-            val downloadUrl = ref.downloadUrl.await()
-            return downloadUrl.toString()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            return null
+    private fun uploadFoto(uri: Uri?, tipo: String, callback: (String?) -> Unit) {
+        if (uri == null) {
+            callback(null)
+            return
         }
-    }
 
-    private suspend fun uploadFotos() {
-        fotoAntesUrl = uploadFoto(fotoAntesUri, "antes")
-        fotoDepoisUrl = uploadFoto(fotoDepoisUri, "depois")
+        val nomeArquivo = "visitas/${System.currentTimeMillis()}_${tipo}_${UUID.randomUUID()}.jpg"
+        val ref = storage.child(nomeArquivo)
+        
+        ref.putFile(uri)
+            .addOnSuccessListener {
+                ref.downloadUrl.addOnSuccessListener { downloadUri ->
+                    callback(downloadUri.toString())
+                }.addOnFailureListener {
+                    callback(null)
+                }
+            }
+            .addOnFailureListener {
+                callback(null)
+            }
     }
 
     private fun salvarVisita() {
@@ -240,7 +246,6 @@ class VisitaFragment : Fragment() {
         binding.progressVisita.visibility = View.VISIBLE
         binding.btnSalvarVisita.isEnabled = false
 
-        // Coletar serviços selecionados
         val servicos = mutableListOf<String>()
         val checkboxes = listOf(
             binding.chkAspiracao,
@@ -256,12 +261,12 @@ class VisitaFragment : Fragment() {
             }
         }
 
-        // Upload das fotos em background
-        val scope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO)
-        scope.launch {
-            uploadFotos()
+        // Upload das fotos
+        uploadFoto(fotoAntesUri, "antes") { urlAntes ->
+            fotoAntesUrl = urlAntes
+            uploadFoto(fotoDepoisUri, "depois") { urlDepois ->
+                fotoDepoisUrl = urlDepois
 
-            kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
                 val visita = Visita(
                     clienteId = clienteSelecionado?.id ?: "",
                     clienteNome = clienteSelecionado?.nome ?: "",
@@ -278,7 +283,7 @@ class VisitaFragment : Fragment() {
                     timestamp = System.currentTimeMillis()
                 )
 
-                database.child("visitas_pendentes").push().setValue(visita)
+                databaseVisitas.push().setValue(visita)
                     .addOnSuccessListener {
                         binding.progressVisita.visibility = View.GONE
                         binding.btnSalvarVisita.isEnabled = true
