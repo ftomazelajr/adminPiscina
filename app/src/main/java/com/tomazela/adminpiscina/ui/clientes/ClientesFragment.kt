@@ -13,7 +13,7 @@ import com.tomazela.adminpiscina.R
 import com.tomazela.adminpiscina.databinding.FragmentClientesBinding
 import com.tomazela.adminpiscina.databinding.DialogClienteBinding
 import com.tomazela.adminpiscina.data.models.Cliente
-import kotlinx.coroutines.*
+import com.tomazela.adminpiscina.utils.FirebaseHelper
 
 class ClientesFragment : Fragment() {
     private var _binding: FragmentClientesBinding? = null
@@ -35,7 +35,13 @@ class ClientesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        database = FirebaseDatabase.getInstance().getReference("clientes")
+        // Cada usuário tem sua própria pasta de clientes
+        val ref = FirebaseHelper.getUserNodeRef("clientes")
+        if (ref == null) {
+            Toast.makeText(context, "Usuário não logado", Toast.LENGTH_SHORT).show()
+            return
+        }
+        database = ref
 
         setupRecyclerView()
         setupListeners()
@@ -82,7 +88,7 @@ class ClientesFragment : Fragment() {
 
             override fun onCancelled(error: DatabaseError) {
                 binding.progressClientes.visibility = View.GONE
-                Toast.makeText(context, "Erro ao carregar clientes", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Erro ao carregar clientes: ${error.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -153,7 +159,7 @@ class ClientesFragment : Fragment() {
                 Toast.makeText(context, "Cliente adicionado!", Toast.LENGTH_SHORT).show()
             }
             .addOnFailureListener {
-                Toast.makeText(context, "Erro ao adicionar cliente", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Erro ao adicionar cliente: ${it.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
@@ -164,7 +170,7 @@ class ClientesFragment : Fragment() {
                     Toast.makeText(context, "Cliente atualizado!", Toast.LENGTH_SHORT).show()
                 }
                 .addOnFailureListener {
-                    Toast.makeText(context, "Erro ao atualizar cliente", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Erro ao atualizar cliente: ${it.message}", Toast.LENGTH_SHORT).show()
                 }
         }
     }
@@ -180,7 +186,7 @@ class ClientesFragment : Fragment() {
                             Toast.makeText(context, "Cliente excluído!", Toast.LENGTH_SHORT).show()
                         }
                         .addOnFailureListener {
-                            Toast.makeText(context, "Erro ao excluir cliente", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Erro ao excluir cliente: ${it.message}", Toast.LENGTH_SHORT).show()
                         }
                 }
             }

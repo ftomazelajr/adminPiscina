@@ -13,6 +13,7 @@ import com.tomazela.adminpiscina.R
 import com.tomazela.adminpiscina.databinding.FragmentProdutosBinding
 import com.tomazela.adminpiscina.databinding.DialogProdutoBinding
 import com.tomazela.adminpiscina.data.models.Produto
+import com.tomazela.adminpiscina.utils.FirebaseHelper
 
 class ProdutosFragment : Fragment() {
     private var _binding: FragmentProdutosBinding? = null
@@ -34,7 +35,13 @@ class ProdutosFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        database = FirebaseDatabase.getInstance().getReference("produtos")
+        // Cada usuário tem sua própria pasta de produtos
+        val ref = FirebaseHelper.getUserNodeRef("produtos")
+        if (ref == null) {
+            Toast.makeText(context, "Usuário não logado", Toast.LENGTH_SHORT).show()
+            return
+        }
+        database = ref
 
         setupRecyclerView()
         setupListeners()

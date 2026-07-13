@@ -15,13 +15,16 @@ import com.tomazela.adminpiscina.data.models.Cliente
 import com.tomazela.adminpiscina.data.models.ItemPedido
 import com.tomazela.adminpiscina.data.models.Pedido
 import com.tomazela.adminpiscina.data.models.Produto
+import com.tomazela.adminpiscina.utils.FirebaseHelper
 import java.text.NumberFormat
 import java.util.Locale
 
 class PdvFragment : Fragment() {
     private var _binding: FragmentPdvBinding? = null
     private val binding get() = _binding!!
-    private lateinit var database: DatabaseReference
+    private lateinit var databaseClientes: DatabaseReference
+    private lateinit var databaseProdutos: DatabaseReference
+    private lateinit var databasePedidos: DatabaseReference
     private lateinit var produtosAdapter: ProdutoPdvAdapter
     private lateinit var carrinhoAdapter: CarrinhoAdapter
     
@@ -43,7 +46,19 @@ class PdvFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        database = FirebaseDatabase.getInstance().getReference()
+        // Cada usuário tem suas próprias pastas
+        val refClientes = FirebaseHelper.getUserNodeRef("clientes")
+        val refProdutos = FirebaseHelper.getUserNodeRef("produtos")
+        val refPedidos = FirebaseHelper.getUserNodeRef("pedidos_pendentes")
+        
+        if (refClientes == null || refProdutos == null || refPedidos == null) {
+            Toast.makeText(context, "Usuário não logado", Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        databaseClientes = refClientes
+        databaseProdutos = refProdutos
+        databasePedidos = refPedidos
 
         setupRecyclerViews()
         setupListeners()
@@ -122,7 +137,7 @@ class PdvFragment : Fragment() {
     }
 
     private fun carregarClientes() {
-        database.child("clientes").addListenerForSingleValueEvent(object : ValueEventListener {
+        databaseClientes.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 clientes.clear()
                 snapshot.children.forEach { child ->
@@ -173,7 +188,7 @@ class PdvFragment : Fragment() {
     }
 
     private fun carregarProdutos() {
-        database.child("produtos").addValueEventListener(object : ValueEventListener {
+        databaseProdutos.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 produtos.clear()
                 snapshot.children.forEach { child ->
@@ -330,7 +345,7 @@ class PdvFragment : Fragment() {
             timestamp = System.currentTimeMillis()
         )
 
-        database.child("pedidos_pendentes").push().setValue(pedido)
+        databasePedidos.push().setValue(pedido)
             .addOnSuccessListener {
                 binding.progressPdv.visibility = View.GONE
                 Toast.makeText(context, "Pedido enviado para aprovação!", Toast.LENGTH_LONG).show()
