@@ -358,6 +358,101 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- FOTOS -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="@color/surface_medium"
+            android:layout_marginBottom="12dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="7. Fotos (Antes e Depois)"
+                    android:textColor="@color/accent_blue"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Tire fotos da piscina antes e depois da limpeza"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Foto ANTES -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="📸 Foto ANTES da limpeza:"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="8dp" />
+
+                <Button
+                    android:id="@+id/btnFotoAntes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Tirar Foto ANTES"
+                    android:textAllCaps="false"
+                    android:backgroundTint="@color/warning_orange"
+                    android:textColor="@color/white"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/tvFotoAntes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Nenhuma foto selecionada"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"
+                    android:gravity="center"
+                    android:padding="8dp"
+                    android:background="@color/surface_light"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Foto DEPOIS -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="📸 Foto DEPOIS da limpeza:"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="8dp" />
+
+                <Button
+                    android:id="@+id/btnFotoDepois"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Tirar Foto DEPOIS"
+                    android:textAllCaps="false"
+                    android:backgroundTint="@color/success_green"
+                    android:textColor="@color/white"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/tvFotoDepois"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Nenhuma foto selecionada"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"
+                    android:gravity="center"
+                    android:padding="8dp"
+                    android:background="@color/surface_light" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
         <!-- Botão Salvar -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSalvarVisita"

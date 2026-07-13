@@ -51,12 +51,23 @@ class FaturamentoFragment : Fragment() {
 
     private fun carregarFaturas() {
         binding.progressFaturamento.visibility = View.VISIBLE
+        binding.tvTotalFaturas.text = "R$ 0,00"
+        binding.tvPendente.text = "R$ 0,00"
+        binding.tvPago.text = "R$ 0,00"
 
         database.child("faturas").addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 faturas.clear()
                 totalPendente = 0.0
                 totalPago = 0.0
+
+                if (!snapshot.exists()) {
+                    binding.progressFaturamento.visibility = View.GONE
+                    adapter.submitList(emptyList())
+                    atualizarResumo()
+                    Toast.makeText(context, "Nenhuma fatura encontrada. Crie uma no PDV!", Toast.LENGTH_LONG).show()
+                    return
+                }
 
                 snapshot.children.forEach { child ->
                     try {
