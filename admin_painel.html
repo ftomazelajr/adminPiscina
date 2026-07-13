@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin - Tomazela Piscinas</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(to bottom, #004e92 0%, #000428 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            padding: 20px;
+            border-bottom: 2px solid #007bff;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 2.5rem;
+            color: #fff;
+        }
+        .header p {
+            color: #9ca3af;
+            margin-top: 10px;
+        }
+        .card {
+            background: #2d3748;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid #4b5563;
+        }
+        .card h2 {
+            color: #007bff;
+            margin-bottom: 16px;
+            font-size: 1.3rem;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: #9ca3af;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 2px solid #4b5563;
+            background: #374151;
+            color: #fff;
+            font-size: 1rem;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+        .btn-success {
+            background: #10b981;
+            color: #fff;
+        }
+        .btn-success:hover {
+            background: #059669;
+        }
+        .btn-danger {
+            background: #dc2626;
+            color: #fff;
+        }
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+        .btn-warning {
+            background: #f59e0b;
+            color: #fff;
+        }
+        .btn-warning:hover {
+            background: #d97706;
+        }
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+        }
+        .table-responsive {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #4b5563;
+        }
+        th {
+            color: #007bff;
+            font-weight: bold;
+        }
+        td {
+            color: #e5e7eb;
+        }
+        .status-ativo {
+            color: #10b981;
+            font-weight: bold;
+        }
+        .status-inativo {
+            color: #dc2626;
+            font-weight: bold;
+        }
+        .status-trial {
+            color: #f59e0b;
+            font-weight: bold;
+        }
+        .hidden {
+            display: none;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #9ca3af;
+        }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 12px;
+            color: #fff;
+            font-weight: bold;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+        .toast-success {
+            background: #10b981;
+        }
+        .toast-error {
+            background: #dc2626;
+        }
+        @keyframes slideIn {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏊 Painel Administrativo</h1>
+            <p>Gerencie seus piscineiros e controle de acesso</p>
+        </div>
+
+        <!-- Card de Cadastro -->
+        <div class="card" id="cardCadastro">
+            <h2>📝 Cadastrar Novo Piscineiro</h2>
+            <div class="grid-2">
+                <div>
+                    <div class="form-group">
+                        <label>Nome do Piscineiro</label>
+                        <input type="text" id="nomePiscineiro" placeholder="Ex: João Silva">
+                    </div>
+                    <div class="form-group">
+                        <label>Email (Login)</label>
+                        <input type="email" id="emailPiscineiro" placeholder="joao@gmail.com">
+                    </div>
+                </div>
+                <div>
+                    <div class="form-group">
+                        <label>Senha</label>
+                        <input type="text" id="senhaPiscineiro" placeholder="Digite uma senha">
+                    </div>
+                    <div class="form-group">
+                        <label>Plano</label>
+                        <select id="planoPiscineiro">
+                            <option value="trial">Trial (7 dias grátis)</option>
+                            <option value="mensal">Mensal (R$ 49,90)</option>
+                            <option value="anual">Anual (R$ 499,90)</option>
+                            <option value="vitalicio">Vitalício</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-success" onclick="cadastrarPiscineiro()">✅ Cadastrar Piscineiro</button>
+        </div>
+
+        <!-- Lista de Piscineiros -->
+        <div class="card">
+            <h2>👥 Piscineiros Cadastrados</h2>
+            <div id="listaPiscineiros">
+                <div class="loading">Carregando...</div>
+            </div>
+        </div>
+
+        <!-- Status -->
+        <div class="card" id="cardStatus">
+            <h2>📊 Status do Sistema</h2>
+            <div class="grid-2">
+                <div>
+                    <p>Total de Piscineiros: <strong id="totalPiscineiros">0</strong></p>
+                    <p>Ativos: <strong id="totalAtivos" style="color: #10b981;">0</strong></p>
+                </div>
+                <div>
+                    <p>Inativos: <strong id="totalInativos" style="color: #dc2626;">0</strong></p>
+                    <p>Em Trial: <strong id="totalTrial" style="color: #f59e0b;">0</strong></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+        import { getDatabase, ref, get, set, remove, push, update } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-database.js";
+        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB_2Ssx3a3CW3PEP2RBh7j5TQl1UPuSg4k",
+            authDomain: "tomazela-piscinas.firebaseapp.com",
+            databaseURL: "https://tomazela-piscinas-default-rtdb.firebaseio.com",
+            projectId: "tomazela-piscinas",
+            storageBucket: "tomazela-piscinas.firebasestorage.app",
+            messagingSenderId: "776818671387",
+            appId: "1:776818671387:web:ca4211e6fa8f3f1c889dbe",
+            measurementId: "G-PP230KYC4X"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const auth = getAuth(app);
+
+        // Variáveis globais
+        window.piscineiros = [];
+
+        // Função para mostrar toast
+        function showToast(mensagem, tipo = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${tipo}`;
+            toast.textContent = mensagem;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.remove();
+            }, 4000);
+        }
+
+        // Função para cadastrar piscineiro
+        window.cadastrarPiscineiro = async function() {
+            const nome = document.getElementById('nomePiscineiro').value.trim();
+            const email = document.getElementById('emailPiscineiro').value.trim();
+            const senha = document.getElementById('senhaPiscineiro').value.trim();
+            const plano = document.getElementById('planoPiscineiro').value;
+
+            if (!nome || !email || !senha) {
+                showToast('Preencha todos os campos!', 'error');
+                return;
+            }
+
+            if (senha.length < 6) {
+                showToast('A senha deve ter pelo menos 6 caracteres!', 'error');
+                return;
+            }
+
+            try {
+                // 1. Criar usuário no Firebase Auth
+                const userCredential = await createUserWithEmailAndPassword(auth, email, senha);
+                const uid = userCredential.user.uid;
+
+                // 2. Calcular data de vencimento
+                const hoje = new Date();
+                let dataVencimento = '';
+                if (plano === 'trial') {
+                    hoje.setDate(hoje.getDate() + 7);
+                    dataVencimento = hoje.toISOString().split('T')[0];
+                } else if (plano === 'mensal') {
+                    hoje.setMonth(hoje.getMonth() + 1);
+                    dataVencimento = hoje.toISOString().split('T')[0];
+                } else if (plano === 'anual') {
+                    hoje.setFullYear(hoje.getFullYear() + 1);
+                    dataVencimento = hoje.toISOString().split('T')[0];
+                } else {
+                    dataVencimento = '2099-12-31';
+                }
+
+                // 3. Salvar dados do usuário no Realtime Database
+                const usuarioRef = ref(database, `dados/${uid}/usuario`);
+                await set(usuarioRef, {
+                    nome: nome,
+                    email: email,
+                    plano: plano,
+                    dataVencimento: dataVencimento,
+                    status: 'ativo',
+                    dataCadastro: new Date().toISOString().split('T')[0]
+                });
+
+                // 4. Criar pastas vazias para os dados do usuário
+                const pastas = ['clientes', 'produtos', 'pedidos_pendentes', 'pedidos', 'visitas_pendentes', 'visitas', 'faturas'];
+                for (const pasta of pastas) {
+                    await set(ref(database, `dados/${uid}/${pasta}`), {});
+                }
+
+                showToast(`✅ Piscineiro ${nome} cadastrado com sucesso!`, 'success');
+                
+                // Limpar campos
+                document.getElementById('nomePiscineiro').value = '';
+                document.getElementById('emailPiscineiro').value = '';
+                document.getElementById('senhaPiscineiro').value = '';
+                
+                // Recarregar lista
+                carregarPiscineiros();
+
+            } catch (error) {
+                console.error('Erro:', error);
+                showToast(`❌ Erro: ${error.message}`, 'error');
+            }
+        };
+
+        // Função para carregar lista de piscineiros
+        async function carregarPiscineiros() {
+            const container = document.getElementById('listaPiscineiros');
+            container.innerHTML = '<div class="loading">Carregando...</div>';
+
+            try {
+                // Buscar todos os usuários
+                const snapshot = await get(ref(database, 'dados'));
+                const piscineiros = [];
+                let totalAtivos = 0;
+                let totalInativos = 0;
+                let totalTrial = 0;
+
+                if (snapshot.exists()) {
+                    snapshot.forEach(child => {
+                        const uid = child.key;
+                        const dados = child.val();
+                        const usuario = dados.usuario || {};
+                        if (usuario.nome) {
+                            piscineiros.push({
+                                uid: uid,
+                                ...usuario
+                            });
+                            if (usuario.status === 'ativo') totalAtivos++;
+                            else if (usuario.status === 'inativo') totalInativos++;
+                            else if (usuario.plano === 'trial') totalTrial++;
+                        }
+                    });
+                }
+
+                window.piscineiros = piscineiros;
+
+                // Atualizar stats
+                document.getElementById('totalPiscineiros').textContent = piscineiros.length;
+                document.getElementById('totalAtivos').textContent = totalAtivos;
+                document.getElementById('totalInativos').textContent = totalInativos;
+                document.getElementById('totalTrial').textContent = totalTrial;
+
+                // Renderizar tabela
+                if (piscineiros.length === 0) {
+                    container.innerHTML = '<p style="color: #9ca3af;">Nenhum piscineiro cadastrado ainda.</p>';
+                    return;
+                }
+
+                let html = `
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Email</th>
+                                    <th>Plano</th>
+                                    <th>Vencimento</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                piscineiros.forEach(p => {
+                    const statusClass = p.status === 'ativo' ? 'status-ativo' : 
+                                      p.status === 'trial' ? 'status-trial' : 'status-inativo';
+                    const statusText = p.status === 'ativo' ? '✅ Ativo' :
+                                      p.status === 'trial' ? '🔄 Trial' : '❌ Inativo';
+                    
+                    html += `
+                        <tr>
+                            <td><strong>${p.nome}</strong></td>
+                            <td>${p.email}</td>
+                            <td>${p.plano || 'Mensal'}</td>
+                            <td>${p.dataVencimento || 'N/A'}</td>
+                            <td class="${statusClass}">${statusText}</td>
+                            <td>
+                                ${p.status === 'ativo' ? 
+                                    `<button class="btn btn-danger btn-sm" onclick="bloquearPiscineiro('${p.uid}')">Bloquear</button>` :
+                                    `<button class="btn btn-success btn-sm" onclick="ativarPiscineiro('${p.uid}')">Ativar</button>`
+                                }
+                                <button class="btn btn-warning btn-sm" onclick="renovarPlano('${p.uid}')">Renovar</button>
+                                <button class="btn btn-danger btn-sm" onclick="excluirPiscineiro('${p.uid}', '${p.nome}')">🗑️</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                html += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+
+                container.innerHTML = html;
+
+            } catch (error) {
+                console.error('Erro:', error);
+                container.innerHTML = `<p style="color: #dc2626;">❌ Erro ao carregar: ${error.message}</p>`;
+            }
+        }
+
+        // Função para bloquear piscineiro
+        window.bloquearPiscineiro = async function(uid) {
+            if (!confirm('Tem certeza que deseja BLOQUEAR este piscineiro?')) return;
+            
+            try {
+                await update(ref(database, `dados/${uid}/usuario`), { status: 'inativo' });
+                showToast('✅ Piscineiro bloqueado!', 'success');
+                carregarPiscineiros();
+            } catch (error) {
+                showToast(`❌ Erro: ${error.message}`, 'error');
+            }
+        };
+
+        // Função para ativar piscineiro
+        window.ativarPiscineiro = async function(uid) {
+            if (!confirm('Tem certeza que deseja ATIVAR este piscineiro?')) return;
+            
+            try {
+                await update(ref(database, `dados/${uid}/usuario`), { status: 'ativo' });
+                showToast('✅ Piscineiro ativado!', 'success');
+                carregarPiscineiros();
+            } catch (error) {
+                showToast(`❌ Erro: ${error.message}`, 'error');
+            }
+        };
+
+        // Função para renovar plano
+        window.renovarPlano = async function(uid) {
+            const plano = prompt('Digite o novo plano (mensal, anual, vitalicio, trial):');
+            if (!plano) return;
+
+            const hoje = new Date();
+            let dataVencimento = '';
+            if (plano === 'trial') {
+                hoje.setDate(hoje.getDate() + 7);
+                dataVencimento = hoje.toISOString().split('T')[0];
+            } else if (plano === 'mensal') {
+                hoje.setMonth(hoje.getMonth() + 1);
+                dataVencimento = hoje.toISOString().split('T')[0];
+            } else if (plano === 'anual') {
+                hoje.setFullYear(hoje.getFullYear() + 1);
+                dataVencimento = hoje.toISOString().split('T')[0];
+            } else {
+                dataVencimento = '2099-12-31';
+            }
+
+            try {
+                await update(ref(database, `dados/${uid}/usuario`), {
+                    plano: plano,
+                    dataVencimento: dataVencimento,
+                    status: 'ativo'
+                });
+                showToast('✅ Plano renovado!', 'success');
+                carregarPiscineiros();
+            } catch (error) {
+                showToast(`❌ Erro: ${error.message}`, 'error');
+            }
+        };
+
+        // Função para excluir piscineiro
+        window.excluirPiscineiro = async function(uid, nome) {
+            if (!confirm(`Tem certeza que deseja EXCLUIR o piscineiro ${nome}? Esta ação é irreversível!`)) return;
+            
+            try {
+                await remove(ref(database, `dados/${uid}`));
+                showToast(`✅ ${nome} excluído!`, 'success');
+                carregarPiscineiros();
+            } catch (error) {
+                showToast(`❌ Erro: ${error.message}`, 'error');
+            }
+        };
+
+        // Carregar ao iniciar
+        carregarPiscineiros();
+
+        // Atualizar a cada 30 segundos
+        setInterval(carregarPiscineiros, 30000);
+    </script>
+</body>
+</html>
