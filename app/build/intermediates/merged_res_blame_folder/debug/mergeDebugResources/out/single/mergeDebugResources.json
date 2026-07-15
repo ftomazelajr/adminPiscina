@@ -1,0 +1,138 @@
+[
+    {
+        "merged": "com.tomazela.adminpiscina.app-debug-61:/layout_activity_main.xml.flat",
+        "source": "com.tomazela.adminpiscina.app-main-63:/layout/activity_main.xml"
+    },
+    {
+        "merged": "com.tomazela.adminpiscina.app-debug-61:/layout_fragment_produtos.xml.flat",
+        "source": "com.tomazela.adminpiscina.app-main-63:/layout/fragment_produtos.xml"
+    },
+    {
+        "merged": "com.tomazela.adminpiscina.app-debug-61:/layout_item_servico.xml.flat",
+        "source": "com.tomazela.adminpiscina.app-main-63:/layout/item_servico.xml"
+    },
+    {
+        "merged": "com.tomazela.adminpiscina.app-debug-61:/layout_activity_login.xml.flat",
+        "source": "com.tomazela.adminpiscina.app-main-63:/layout/activity_login.xml"
+    },
+    {
+        "merged": "com.tomazela.adminpiscina.app-debug-61:/layout_item_fatura.xml.flat",
+        "source": "com.tomazela.adminpiscina.app-main-63:/layout/item_fatura.xml"
+    },
+    {
+        "merged": "com.tomazela.adminpiscina.app-debug-61:/layout_fragment_recebimentos.xml.flat",
+        "source": "com.tomazela.adminpiscina.app-main-63:/layout/fragment_recebimentos.xml"
+    },
+    {
+        "merged": "com.tomazela.adminpiscina.app-debug-61:/mipmap-xxhdpi_ic_launcher_round.xml.flat",
+        "source": "com.tomazela.adminpiscina.app-main-63:/mipmap-xxhdpi/ic_launcher_round.xml"
+    },
+    {
+        "merged": "com.tomazela.adminpiscina.app-debug-61:/xml_file_paths.xml.flat",
+        "source": "com.tomazela.adminpiscina.app-main-63:/xml/file_paths.xml"
+    },
+    {
+        "merged": "com.tomazela.adminpiscina.app-debug-61:/mipmap-xhdpi_ic_launcher_round.xml.flat",
+        "source": "com.tomazela.adminpiscina.app-main-63:/mipmap-xhdpi/ic_launcher_round.xml"
+    },
+    {
+        "merged": "com.tomazela.adminpiscina.app-debug-61:/mipmap-hdpi_ic_launcher.xml.flat",
+        "source": "com.tomazela.adminpiscina.app-main-63:/mipmap-hdpi/ic_launcher.xml"
+    },
+    {
+        "merged": "com.tomazela.adminpiscina.app-debug-61:/drawable_ic_logout.xml.flat",
+        "source": "com.tomazela.adminpiscina.app-main-63:/drawable/ic_logout.xml"
+    },
+    {
+        "merged": "com.tomazela.adminpiscina.app-debug-61:/layout_item_carrinho.xml.flat",
+        "source": "com.tomazela.adminpiscina.app-main-63:/layout/item_carrinho.xml"
+    },
+    {
+        "merged": "com.tomazela.adminpiscina.app-debug-61:/drawable_ic_launcher.xml.flat",
+        "source": "com.tomazela.adminpiscina.app-main-63:/drawable/ic_launcher.xml"
+    },
+    {
+        "merged": "com.tomazela.adminpiscina.app-debug-61:/mipmap-hdpi_ic_launcher_round.xml.flat",
+        "source": "com.tomazela.adminpiscina.app-main-63:/mipmap-hdpi/ic_launcher_round.xml"
+    },
+    {
+        "merged": "com.tomazela.adminpiscina.app-debug-61:/layout_fragment_dashboard.xml.flat",
+        "source": "com.tomazela.adminpiscina.app-main-63:/layout/fragment_dashboard.xml"
+    },
+    {
+        "merged": "com.tomazela.adminpiscina.app-debug-61:/layout_dialog_cliente.xml.flat",
+        "source": "com.tomazela.adminpiscina.app-main-63:/layout/dialog_cliente.xml"
+    },
+    {
+        "merged": "com.tomazela.adminpiscina.app-debug-61:/layout_item_recebimento.xml.flat",
+        "source": "com.tomazela.adminpiscina.app-main-63:/layout/item_recebimento.xml"
+    },
+    {
+        "merged": "com.tomazela.adminpiscina.app-debug-61:/mipmap-mdpi_ic_launcher_round.xml.flat",
+        "source": "com.tomazela.adminpiscina.app-main-63:/mipmap-mdpi/ic_launcher_round.xml"
+    },
+    {
+        "merged": "com.tomazela.adminpiscina.app-debug-61:/layout_fragment_servicos.xml.flat",
+        "source": "com.tomazela.adminpiscina.app-main-63:/layout/fragment_servicos.xml"
+    },
+    {
+        "merged": "com.tomazela.adminpiscina.app-debug-61:/layout_item_produto_pdv.xml.flat",
+        "source": "com.tomazela.adminpiscina.app-main-63:/layout/item_produto_pdv.xml"
+    },
+    {
+        "merged": "com.tomazela.adminpiscina.app-debug-61:/layout_dialog_notinha.xml.flat",
+        "source": "com.tomazela.adminpiscina.app-main-63:/layout/dialog_notinha.xml"
+    },
+    {
+        "merged": "com.tomazela.adminpiscina.app-debug-61:/layout_item_produto.xml.flat",
+        "source": "com.tomazela.adminpiscina.app-main-63:/layout/item_produto.xml"
+    },
+    {
+        "merged": "com.tomazela.adminpiscina.app-debug-61:/layout_dialog_produto.xml.flat",
+        "source": "com.tomazela.adminpiscina.app-main-63:/layout/dialog_produto.xml"
+    },
+    {
+        "merged": "com.tomazela.adminpiscina.app-debug-61:/mipmap-xhdpi_ic_launcher.xml.flat",
+        "source": "com.tomazela.adminpiscina.app-main-63:/mipmap-xhdpi/ic_launcher.xml"
+    },
+    {
+        "merged": "com.tomazela.adminpiscina.app-debug-61:/mipmap-mdpi_ic_launcher.xml.flat",
+        "source": "com.tomazela.adminpiscina.app-main-63:/mipmap-mdpi/ic_launcher.xml"
+    },
+    {
+        "merged": "com.tomazela.adminpiscina.app-debug-61:/layout_item_cliente.xml.flat",
+        "source": "com.tomazela.adminpiscina.app-main-63:/layout/item_cliente.xml"
+    },
+    {
+        "merged": "com.tomazela.adminpiscina.app-debug-61:/layout_fragment_clientes.xml.flat",
+        "source": "com.tomazela.adminpiscina.app-main-63:/layout/fragment_clientes.xml"
+    },
+    {
+        "merged": "com.tomazela.adminpiscina.app-debug-61:/mipmap-xxxhdpi_ic_launcher_round.xml.flat",
+        "source": "com.tomazela.adminpiscina.app-main-63:/mipmap-xxxhdpi/ic_launcher_round.xml"
+    },
+    {
+        "merged": "com.tomazela.adminpiscina.app-debug-61:/layout_fragment_pdv.xml.flat",
+        "source": "com.tomazela.adminpiscina.app-main-63:/layout/fragment_pdv.xml"
+    },
+    {
+        "merged": "com.tomazela.adminpiscina.app-debug-61:/mipmap-xxhdpi_ic_launcher.xml.flat",
+        "source": "com.tomazela.adminpiscina.app-main-63:/mipmap-xxhdpi/ic_launcher.xml"
+    },
+    {
+        "merged": "com.tomazela.adminpiscina.app-debug-61:/mipmap-xxxhdpi_ic_launcher.xml.flat",
+        "source": "com.tomazela.adminpiscina.app-main-63:/mipmap-xxxhdpi/ic_launcher.xml"
+    },
+    {
+        "merged": "com.tomazela.adminpiscina.app-debug-61:/layout_fragment_faturamento.xml.flat",
+        "source": "com.tomazela.adminpiscina.app-main-63:/layout/fragment_faturamento.xml"
+    },
+    {
+        "merged": "com.tomazela.adminpiscina.app-debug-61:/drawable_login_background.xml.flat",
+        "source": "com.tomazela.adminpiscina.app-main-63:/drawable/login_background.xml"
+    },
+    {
+        "merged": "com.tomazela.adminpiscina.app-debug-61:/drawable_ic_voltar.xml.flat",
+        "source": "com.tomazela.adminpiscina.app-main-63:/drawable/ic_voltar.xml"
+    }
+]

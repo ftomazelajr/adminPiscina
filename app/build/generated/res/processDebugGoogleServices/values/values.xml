@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="gcm_defaultSenderId" translatable="false">776818671387</string>
+    <string name="google_api_key" translatable="false">AIzaSyB_2Ssx3a3CW3PEP2RBh7j5TQl1UPuSg4k</string>
+    <string name="google_app_id" translatable="false">1:776818671387:android:ca4211e6fa8f3f1c889dbe</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyB_2Ssx3a3CW3PEP2RBh7j5TQl1UPuSg4k</string>
+    <string name="project_id" translatable="false">tomazela-piscinas</string>
+</resources>

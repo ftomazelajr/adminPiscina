@@ -1,0 +1,40 @@
+========================================
+  CORREÇÃO PARA O APP VER OS DADOS
+========================================
+
+1. No Firebase Console, mantenha as regras:
+{
+  "rules": {
+    ".read": true,
+    ".write": true
+  }
+}
+
+2. Se os dados estão em dados/SEU_UID/clientes/,
+   o app precisa ser atualizado para ler de lá.
+
+3. Se você quer que o app leia da raiz (clientes/),
+   mova os dados da pasta dados/SEU_UID/ para a raiz.
+
+========================================
+  COPIAR DADOS DA PASTA DO USUÁRIO PARA A RAIZ
+========================================
+
+No Firebase Console:
+
+1. Vá em dados/bjtxYFDOBaOXuc60V8YEluuaTpp1/clientes/
+2. Clique nos 3 pontos → "Exportar JSON" (ou copie)
+3. Vá para a raiz (clique no nome do banco)
+4. Clique no "+" → nome: "clientes"
+5. Cole os dados
+
+Repita para:
+- produtos/
+- pedidos/
+- faturas/
+- visitas/
+- servicos/
+- empresa/
+- etc.
+
+========================================

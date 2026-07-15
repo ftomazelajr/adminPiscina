@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="accent_blue">#007bff</color>
+    <color name="black">#FF000000</color>
+    <color name="danger_red">#dc2626</color>
+    <color name="primary_blue">#004e92</color>
+    <color name="primary_blue_dark">#000428</color>
+    <color name="success_green">#10b981</color>
+    <color name="surface_dark">#1a202c</color>
+    <color name="surface_light">#4a5568</color>
+    <color name="surface_medium">#2d3748</color>
+    <color name="text_primary">#ffffff</color>
+    <color name="text_secondary">#9ca3af</color>
+    <color name="warning_orange">#f59e0b</color>
+    <color name="white">#FFFFFFFF</color>
+    <string name="app_name">Admin Piscina</string>
+    <string name="gcm_defaultSenderId" translatable="false">776818671387</string>
+    <string name="google_api_key" translatable="false">AIzaSyB_2Ssx3a3CW3PEP2RBh7j5TQl1UPuSg4k</string>
+    <string name="google_app_id" translatable="false">1:776818671387:android:ca4211e6fa8f3f1c889dbe</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyB_2Ssx3a3CW3PEP2RBh7j5TQl1UPuSg4k</string>
+    <string name="project_id" translatable="false">tomazela-piscinas</string>
+    <style name="Theme.AdminPiscina" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/primary_blue</item>
+        <item name="colorPrimaryVariant">@color/primary_blue_dark</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/accent_blue</item>
+        <item name="colorSecondaryVariant">@color/accent_blue</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="android:statusBarColor">@color/primary_blue_dark</item>
+        <item name="android:windowBackground">@color/primary_blue_dark</item>
+    </style>
+    <style name="Theme.AdminPiscina.Login" parent="Theme.AdminPiscina">
+        <item name="android:windowBackground">@drawable/login_background</item>
+    </style>
+</resources>
