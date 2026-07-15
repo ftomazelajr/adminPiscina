@@ -2,3 +2,7 @@
 <resources>
     <string name="app_name">Admin Piscina</string>
 </resources>
+    <string-array name="tipo_itens">
+        <item>Produto</item>
+        <item>Serviço</item>
+    </string-array>

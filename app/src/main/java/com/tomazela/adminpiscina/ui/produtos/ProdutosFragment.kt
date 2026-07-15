@@ -35,7 +35,6 @@ class ProdutosFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Cada usuário tem sua própria pasta de produtos
         val ref = FirebaseHelper.getUserNodeRef("produtos")
         if (ref == null) {
             Toast.makeText(context, "Usuário não logado", Toast.LENGTH_SHORT).show()
@@ -117,7 +116,11 @@ class ProdutosFragment : Fragment() {
             .setView(dialogView.root)
             .create()
 
-        dialogView.tvDialogTitle.text = if (produto == null) "Adicionar Produto" else "Editar Produto"
+        dialogView.tvDialogTitle.text = if (produto == null) "Adicionar Item" else "Editar Item"
+
+        // Adicionar opção de tipo
+        dialogView.tvTipoLabel.visibility = View.VISIBLE
+        dialogView.spinnerTipo.visibility = View.VISIBLE
 
         produto?.let {
             produtoEditando = it
@@ -125,6 +128,11 @@ class ProdutosFragment : Fragment() {
             dialogView.etPreco.setText(it.preco.toString())
             dialogView.etDescricao.setText(it.descricao ?: "")
             dialogView.switchPausado.isChecked = it.pausado
+            if (it.tipo == "servico") {
+                dialogView.spinnerTipo.setSelection(1)
+            } else {
+                dialogView.spinnerTipo.setSelection(0)
+            }
         }
 
         dialogView.btnCancelar.setOnClickListener { dialog.dismiss() }
@@ -134,6 +142,7 @@ class ProdutosFragment : Fragment() {
             val preco = dialogView.etPreco.text.toString().toDoubleOrNull() ?: 0.0
             val descricao = dialogView.etDescricao.text.toString().trim()
             val pausado = dialogView.switchPausado.isChecked
+            val tipo = if (dialogView.spinnerTipo.selectedItemPosition == 0) "produto" else "servico"
 
             if (nome.isEmpty()) {
                 Toast.makeText(context, "Nome é obrigatório", Toast.LENGTH_SHORT).show()
@@ -146,7 +155,7 @@ class ProdutosFragment : Fragment() {
                 preco = preco,
                 descricao = descricao,
                 pausado = pausado,
-                tipo = "produto"
+                tipo = tipo
             )
 
             if (produto == null) {
@@ -164,10 +173,10 @@ class ProdutosFragment : Fragment() {
     private fun salvarProduto(produto: Produto) {
         database.push().setValue(produto)
             .addOnSuccessListener {
-                Toast.makeText(context, "Produto adicionado!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Item adicionado!", Toast.LENGTH_SHORT).show()
             }
             .addOnFailureListener {
-                Toast.makeText(context, "Erro ao adicionar produto: ${it.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Erro ao adicionar: ${it.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
@@ -175,26 +184,26 @@ class ProdutosFragment : Fragment() {
         produto.id.let { id ->
             database.child(id).setValue(produto)
                 .addOnSuccessListener {
-                    Toast.makeText(context, "Produto atualizado!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Item atualizado!", Toast.LENGTH_SHORT).show()
                 }
                 .addOnFailureListener {
-                    Toast.makeText(context, "Erro ao atualizar produto: ${it.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Erro ao atualizar: ${it.message}", Toast.LENGTH_SHORT).show()
                 }
         }
     }
 
     private fun excluirProduto(produto: Produto) {
         AlertDialog.Builder(requireContext())
-            .setTitle("Excluir Produto")
+            .setTitle("Excluir Item")
             .setMessage("Tem certeza que deseja excluir ${produto.nome}?")
             .setPositiveButton("Sim") { _, _ ->
                 produto.id.let { id ->
                     database.child(id).removeValue()
                         .addOnSuccessListener {
-                            Toast.makeText(context, "Produto excluído!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Item excluído!", Toast.LENGTH_SHORT).show()
                         }
                         .addOnFailureListener {
-                            Toast.makeText(context, "Erro ao excluir produto: ${it.message}", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Erro ao excluir: ${it.message}", Toast.LENGTH_SHORT).show()
                         }
                 }
             }
