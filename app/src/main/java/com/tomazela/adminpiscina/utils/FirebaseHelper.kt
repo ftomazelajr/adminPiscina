@@ -9,20 +9,23 @@ object FirebaseHelper {
     private val auth = FirebaseAuth.getInstance()
     private val database = FirebaseDatabase.getInstance()
     
-    // Pega a referência do usuário atual
-    fun getUserRef(): DatabaseReference? {
-        val uid = auth.currentUser?.uid ?: return null
-        return database.getReference("dados").child(uid)
-    }
-    
-    // Pega a referência de um nó específico do usuário
+    // Pega a referência do nó do usuário atual
     fun getUserNodeRef(node: String): DatabaseReference? {
-        val uid = auth.currentUser?.uid ?: return null
-        return database.getReference("dados").child(uid).child(node)
+        val uid = auth.currentUser?.uid
+        return if (uid != null) {
+            database.getReference("dados").child(uid).child(node)
+        } else {
+            null
+        }
     }
     
-    // Pega a referência raiz para dados compartilhados (ex: lista de usuários)
-    fun getSharedRef(node: String): DatabaseReference {
-        return database.getReference(node)
+    // Pega a referência do usuário
+    fun getUserRef(): DatabaseReference? {
+        val uid = auth.currentUser?.uid
+        return if (uid != null) {
+            database.getReference("dados").child(uid)
+        } else {
+            null
+        }
     }
 }

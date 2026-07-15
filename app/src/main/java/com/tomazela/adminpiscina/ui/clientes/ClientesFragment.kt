@@ -35,7 +35,7 @@ class ClientesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Cada usuário tem sua própria pasta de clientes
+        // Usar a nova estrutura: dados/UID/clientes
         val ref = FirebaseHelper.getUserNodeRef("clientes")
         if (ref == null) {
             Toast.makeText(context, "Usuário não logado", Toast.LENGTH_SHORT).show()
