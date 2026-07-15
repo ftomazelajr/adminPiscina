@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import com.google.firebase.auth.FirebaseAuth
 import com.tomazela.adminpiscina.databinding.ActivityMainBinding
 import com.tomazela.adminpiscina.ui.clientes.ClientesFragment
+import com.tomazela.adminpiscina.ui.configuracao.ConfiguracaoFragment
 import com.tomazela.adminpiscina.ui.dashboard.DashboardFragment
 import com.tomazela.adminpiscina.ui.faturamento.FaturamentoFragment
 import com.tomazela.adminpiscina.ui.login.LoginActivity
@@ -36,22 +37,18 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        // Configurar toolbar
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(false)
         supportActionBar?.title = "Dashboard"
 
-        // Carregar o DashboardFragment
         loadFragment(DashboardFragment(), "Dashboard")
     }
 
     fun loadFragment(fragment: Fragment, title: String) {
         currentFragment = fragment
         supportActionBar?.title = title
-        
-        // Mostrar botão de voltar se não for o Dashboard
         supportActionBar?.setDisplayHomeAsUpEnabled(fragment !is DashboardFragment)
-        
+
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, fragment)
             .commit()
@@ -69,10 +66,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         if (currentFragment is DashboardFragment) {
-            // Se estiver no Dashboard, pode sair
             super.onBackPressed()
         } else {
-            // Voltar para o Dashboard
             loadFragment(DashboardFragment(), "Dashboard")
         }
     }
@@ -108,6 +103,10 @@ class MainActivity : AppCompatActivity() {
 
     fun onRecebimentosClick(view: View) {
         loadFragment(RecebimentosFragment(), "Recebimentos")
+    }
+
+    fun onConfiguracaoClick(view: View) {
+        loadFragment(ConfiguracaoFragment(), "Configurações")
     }
 
     private fun navigateToLogin() {

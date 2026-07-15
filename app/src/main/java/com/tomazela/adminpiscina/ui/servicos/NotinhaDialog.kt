@@ -16,8 +16,11 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import com.google.firebase.database.*
 import com.tomazela.adminpiscina.R
+import com.tomazela.adminpiscina.data.models.Empresa
 import com.tomazela.adminpiscina.data.models.Servico
+import com.tomazela.adminpiscina.utils.FirebaseHelper
 import java.io.File
 import java.io.FileOutputStream
 import java.text.NumberFormat
@@ -29,41 +32,87 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
 
     private val formatador = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))
     private val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale("pt", "BR"))
+    private var empresa: Empresa? = null
 
     fun show() {
+        carregarDadosEmpresa {
+            mostrarDialog()
+        }
+    }
+
+    private fun carregarDadosEmpresa(callback: () -> Unit) {
+        val ref = FirebaseHelper.getUserNodeRef("empresa")
+        if (ref == null) {
+            empresa = null
+            callback()
+            return
+        }
+
+        ref.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                empresa = snapshot.getValue(Empresa::class.java)
+                callback()
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                empresa = null
+                callback()
+            }
+        })
+    }
+
+    private fun mostrarDialog() {
         val dialog = Dialog(context)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.dialog_notinha)
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         dialog.setCancelable(true)
-        
+
         configurarNotinha(dialog)
-        
+
         val btnWhatsApp = dialog.findViewById<Button>(R.id.btnWhatsAppNotinha)
         btnWhatsApp?.setOnClickListener {
             compartilharWhatsApp()
         }
-        
+
         val btnSalvar = dialog.findViewById<Button>(R.id.btnSalvarNotinha)
         btnSalvar?.setOnClickListener {
             salvarComoImagem(dialog)
         }
-        
+
         val btnFechar = dialog.findViewById<Button>(R.id.btnFecharNotinha)
         btnFechar?.setOnClickListener {
             dialog.dismiss()
         }
-        
+
         dialog.show()
     }
 
     private fun configurarNotinha(dialog: Dialog) {
         val data = dateFormat.format(Date(servico.timestamp))
         val total = formatador.format(servico.total)
-        
+
+        // Dados da empresa
+        val nomeEmpresa = empresa?.nome ?: "TOM AZELA PISCINAS"
+        val cnpj = empresa?.cnpj ?: "CNPJ: 00.000.000/0001-00"
+        val endereco = empresa?.endereco ?: ""
+        val telefone = empresa?.telefone ?: ""
+        val email = empresa?.email ?: ""
+        val instagram = empresa?.instagram ?: ""
+        val mensagemRodape = empresa?.mensagemRodape ?: "Obrigado pela preferência!"
+
+        // Cabeçalho
+        dialog.findViewById<TextView>(R.id.tvEmpresaNome)?.text = nomeEmpresa.uppercase()
+        dialog.findViewById<TextView>(R.id.tvEmpresaCnpj)?.text = "CNPJ: $cnpj"
+        dialog.findViewById<TextView>(R.id.tvEmpresaEndereco)?.text = endereco
+        dialog.findViewById<TextView>(R.id.tvEmpresaTelefone)?.text = "Tel: $telefone"
+        dialog.findViewById<TextView>(R.id.tvEmpresaEmail)?.text = "📧 $email"
+        dialog.findViewById<TextView>(R.id.tvEmpresaInstagram)?.text = "📷 $instagram"
+
+        // Corpo
         dialog.findViewById<TextView>(R.id.tvDataNotinha)?.text = data
         dialog.findViewById<TextView>(R.id.tvClienteNotinha)?.text = servico.clienteNome
-        
+
         val tvStatus = dialog.findViewById<TextView>(R.id.tvStatusNotinha)
         tvStatus?.text = servico.status.uppercase()
         tvStatus?.setTextColor(
@@ -73,12 +122,13 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
                 else -> ContextCompat.getColor(context, R.color.danger_red)
             }
         )
-        
+
         dialog.findViewById<TextView>(R.id.tvTotalNotinha)?.text = total
-        
+
+        // Itens
         val container = dialog.findViewById<LinearLayout>(R.id.llItensNotinha)
         container?.removeAllViews()
-        
+
         servico.itens.forEach { item ->
             val itemView = LinearLayout(context).apply {
                 orientation = LinearLayout.HORIZONTAL
@@ -88,7 +138,7 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
                 )
                 setPadding(0, 4, 0, 4)
             }
-            
+
             val descricao = TextView(context).apply {
                 text = "${item.quantidade}x ${item.nome}"
                 textSize = 11f
@@ -99,7 +149,7 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
                     1f
                 )
             }
-            
+
             val preco = TextView(context).apply {
                 text = formatador.format(item.precoUnitario * item.quantidade)
                 textSize = 11f
@@ -109,11 +159,14 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 )
             }
-            
+
             itemView.addView(descricao)
             itemView.addView(preco)
             container?.addView(itemView)
         }
+
+        // Rodapé
+        dialog.findViewById<TextView>(R.id.tvRodapeMensagem)?.text = mensagemRodape
     }
 
     private fun compartilharWhatsApp() {
@@ -121,7 +174,7 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
         val intent = Intent(Intent.ACTION_VIEW)
         val url = "https://api.whatsapp.com/send?text=${Uri.encode(notinha)}"
         intent.data = Uri.parse(url)
-        
+
         try {
             context.startActivity(intent)
         } catch (e: Exception) {
@@ -138,51 +191,59 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
         val itensTexto = servico.itens.joinToString("\n") {
             "  ${it.quantidade}x ${it.nome} - ${formatador.format(it.precoUnitario * it.quantidade)}"
         }
-        
+
+        val nomeEmpresa = empresa?.nome ?: "TOM AZELA PISCINAS"
+        val cnpj = empresa?.cnpj ?: "00.000.000/0001-00"
+        val endereco = empresa?.endereco ?: ""
+        val telefone = empresa?.telefone ?: ""
+        val email = empresa?.email ?: ""
+        val instagram = empresa?.instagram ?: ""
+        val mensagemRodape = empresa?.mensagemRodape ?: "Obrigado pela preferência!"
+
         return """
             ========================================
-                   🏊 TOMAZELA PISCINAS
+                   🏊 ${nomeEmpresa.uppercase()}
             ========================================
-            CNPJ: 40.136.528/0001-07
-            Rua Romualdo Albino Balestrin, 35
-            Tel: (14) 98172-2063
-            📷 @tomazelapiscinas
-            📧 tomazelapiscinas@gmail.com
-            
+            CNPJ: $cnpj
+            $endereco
+            Tel: $telefone
+            📷 $instagram
+            📧 $email
+
             📅 DATA: $data
             👤 CLIENTE: ${servico.clienteNome}
-            
+
             ----------------------------------------
             ITENS DO PEDIDO:
             $itensTexto
-            
+
             ----------------------------------------
             TOTAL: $total
             ----------------------------------------
-            
+
             ✅ STATUS: ${servico.status.uppercase()}
-            
+
             ========================================
-            Obrigado pela preferência!
+            $mensagemRodape
             ========================================
-            📷 @tomazelapiscinas
-            📧 tomazelapiscinas@gmail.com
+            📷 $instagram
+            📧 $email
         """.trimIndent()
     }
 
     private fun salvarComoImagem(dialog: Dialog) {
         try {
             val view = dialog.findViewById<LinearLayout>(R.id.llNotinha)
-            
+
             val widthSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
             val heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
             view.measure(widthSpec, heightSpec)
             view.layout(0, 0, view.measuredWidth, view.measuredHeight)
-            
+
             val bitmap = Bitmap.createBitmap(view.measuredWidth, view.measuredHeight, Bitmap.Config.ARGB_8888)
             val canvas = Canvas(bitmap)
             view.draw(canvas)
-            
+
             val fileName = "notinha_${System.currentTimeMillis()}.png"
             val picturesDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
             if (picturesDir != null && !picturesDir.exists()) {
@@ -192,23 +253,23 @@ class NotinhaDialog(private val context: Context, private val servico: Servico) 
             val outputStream = FileOutputStream(file)
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
             outputStream.close()
-            
+
             Toast.makeText(context, "✅ Notinha salva em: ${file.absolutePath}", Toast.LENGTH_LONG).show()
-            
+
             val uri = FileProvider.getUriForFile(
                 context,
                 "${context.packageName}.fileprovider",
                 file
             )
-            
+
             val shareIntent = Intent(Intent.ACTION_SEND).apply {
                 type = "image/png"
                 putExtra(Intent.EXTRA_STREAM, uri)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
-            
+
             context.startActivity(Intent.createChooser(shareIntent, "Compartilhar Imagem"))
-            
+
         } catch (e: Exception) {
             Toast.makeText(context, "Erro ao salvar imagem: ${e.message}", Toast.LENGTH_LONG).show()
             e.printStackTrace()

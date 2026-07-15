@@ -22,6 +22,7 @@
 
             <!-- CABEÇALHO -->
             <TextView
+                android:id="@+id/tvEmpresaNome"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="TOMAZELA PISCINAS"
@@ -32,43 +33,48 @@
                 android:letterSpacing="0.2" />
 
             <TextView
+                android:id="@+id/tvEmpresaCnpj"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="CNPJ: 40.136.528/0001-07"
+                android:text="CNPJ: 00.000.000/0001-00"
                 android:textSize="10sp"
                 android:textColor="#555555"
                 android:gravity="center"
                 android:layout_marginTop="2dp" />
 
             <TextView
+                android:id="@+id/tvEmpresaEndereco"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Rua Romualdo Albino Balestrin, 35"
+                android:text="Rua Exemplo, 123"
                 android:textSize="10sp"
                 android:textColor="#555555"
                 android:gravity="center" />
 
             <TextView
+                android:id="@+id/tvEmpresaTelefone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Tel: (14) 98172-2063"
+                android:text="Tel: (00) 00000-0000"
                 android:textSize="10sp"
                 android:textColor="#555555"
                 android:gravity="center" />
 
             <TextView
+                android:id="@+id/tvEmpresaInstagram"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Email: tomazelapiscinas@gmail.com"
+                android:text="📷 @instagram"
                 android:textSize="10sp"
                 android:textColor="#555555"
                 android:gravity="center"
                 android:layout_marginTop="2dp" />
 
             <TextView
+                android:id="@+id/tvEmpresaEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="📷 @tomazelapiscinas"
+                android:text="📧 email@email.com"
                 android:textSize="10sp"
                 android:textColor="#555555"
                 android:gravity="center" />
@@ -234,6 +240,7 @@
                 android:layout_marginVertical="12dp" />
 
             <TextView
+                android:id="@+id/tvRodapeMensagem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Obrigado pela preferência!"
@@ -242,18 +249,20 @@
                 android:gravity="center" />
 
             <TextView
+                android:id="@+id/tvRodapeInstagram"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="📷 @tomazelapiscinas"
+                android:text="📷 @instagram"
                 android:textSize="10sp"
                 android:textColor="#555555"
                 android:gravity="center"
                 android:layout_marginTop="4dp" />
 
             <TextView
+                android:id="@+id/tvRodapeEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="📧 tomazelapiscinas@gmail.com"
+                android:text="📧 email@email.com"
                 android:textSize="10sp"
                 android:textColor="#555555"
                 android:gravity="center"
